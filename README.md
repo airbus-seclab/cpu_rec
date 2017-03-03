@@ -78,6 +78,71 @@ This is an erroneous detection, due to the fact that
 the IA-64 architecture has statistical properties similar
 to data sections.
 
+# Known architectures in the default corpus
+[`68HC08`](https://en.wikipedia.org/wiki/Freescale_68HC08)
+[`68HC11`](https://en.wikipedia.org/wiki/Freescale_68HC11)
+[`8051`](https://en.wikipedia.org/wiki/Intel_MCS-51)
+[`AArch64`](https://en.wikipedia.org/wiki/ARM_architecture#AArch64)
+[`Alpha`](https://en.wikipedia.org/wiki/DEC_Alpha)
+[`ARcompact`](https://en.wikipedia.org/wiki/ARC_(processor))
+[`ARM64` `ARMeb` `ARMel` `ARMhf`](https://en.wikipedia.org/wiki/ARM_architecture)
+[`AVR`](https://en.wikipedia.org/wiki/Atmel_AVR)
+[`AxisCris`](https://en.wikipedia.org/wiki/ETRAX_CRIS)
+[`Blackfin`](https://en.wikipedia.org/wiki/Blackfin)
+[`Cell-SPU`](https://en.wikipedia.org/wiki/Cell_(microprocessor))
+[`CLIPPER`](https://en.wikipedia.org/wiki/Clipper_architecture)
+[`CompactRISC`](https://en.wikipedia.org/wiki/CompactRISC)
+[`Cray`](https://en.wikipedia.org/wiki/Cray)
+[`Epiphany`](https://en.wikipedia.org/wiki/Adapteva)
+[`FR-V`](https://en.wikipedia.org/wiki/FR-V_(microprocessor))
+[`FR30`](http://www.fujitsu.com/downloads/MICRO/fma/pdfmcu/hm91101-cm71-10102-2e.pdf)
+[`FT32`](https://en.wikipedia.org/wiki/FTDI)
+[`H8-300`](https://en.wikipedia.org/wiki/H8_Family)
+[`HP-Focus`](https://en.wikipedia.org/wiki/HP_FOCUS)
+[`HP-PA`](https://en.wikipedia.org/wiki/PA-RISC)
+[`i860`](https://en.wikipedia.org/wiki/Intel_i860)
+[`IA-64`](https://en.wikipedia.org/wiki/IA-64)
+[`IQ2000`](http://www.ic72.com/pdf_file/v/165699.pdf)
+[`M32C`](https://www.renesas.com/en-eu/products/microcontrollers-microprocessors/m16c.html)
+[`M32R`](https://www.renesas.com/en-eu/products/microcontrollers-microprocessors/m32r.html)
+[`M68k`](https://en.wikipedia.org/wiki/Motorola_68000_series)
+[`M88k`](https://en.wikipedia.org/wiki/Motorola_88000)
+[`MCore`](https://en.wikipedia.org/wiki/M%C2%B7CORE)
+[`Mico32`](https://en.wikipedia.org/wiki/LatticeMico32)
+[`MicroBlaze`](https://en.wikipedia.org/wiki/MicroBlaze)
+[`MIPS16` `MIPSeb` `MIPSel`](https://en.wikipedia.org/wiki/MIPS_instruction_set)
+[`MMIX`](https://en.wikipedia.org/wiki/MMIX)
+[`MN10300`](https://en.wikipedia.org/wiki/MN103)
+[`Moxie`](http://moxielogic.org/blog/)
+[`MSP430`](https://en.wikipedia.org/wiki/TI_MSP430)
+[`NDS32`](http://osdk.andestech.com/index.html)
+[`NIOS-II`](https://en.wikipedia.org/wiki/Nios_II)
+[`OCaml`](https://en.wikipedia.org/wiki/OCaml)
+[`PDP-11`](https://en.wikipedia.org/wiki/PDP-11)
+[`PIC10` `PIC16` `PIC18` `PIC24`](https://en.wikipedia.org/wiki/PIC_microcontroller)
+[`PPCeb` `PPCel`](https://en.wikipedia.org/wiki/PowerPC)
+[`RISC-V`](https://en.wikipedia.org/wiki/RISC-V)
+[`RL78`](https://www.renesas.com/en-eu/products/microcontrollers-microprocessors/rl78.html)
+[`ROMP`](https://en.wikipedia.org/wiki/ROMP)
+[`RX`](https://www.renesas.com/en-eu/products/microcontrollers-microprocessors/rx.html)
+[`S-390`](https://en.wikipedia.org/wiki/IBM_System/390_ES/9000_Enterprise_Systems_Architecture_ESA_family)
+[`SPARC`](https://en.wikipedia.org/wiki/SPARC)
+[`STM8`](https://en.wikipedia.org/wiki/STM8)
+[`Stormy16`](https://sourceware.org/cgen/gen-doc/xstormy16.html)
+[`SuperH`](https://en.wikipedia.org/wiki/SuperH)
+[`TILEPro`](https://en.wikipedia.org/wiki/TILEPro64)
+[`TLCS-90`](https://en.wikipedia.org/wiki/Toshiba_TLCS#90)
+[`TMS320C2x` `TMS320C6x`](https://en.wikipedia.org/wiki/Texas_Instruments_TMS320)
+[`V850`](https://en.wikipedia.org/wiki/V850)
+[`VAX`](https://en.wikipedia.org/wiki/VAX)
+[`Visium`](https://www.slideshare.net/AdaCore/controls-and-dataservices)
+[`WE32000`](https://en.wikipedia.org/wiki/Bellmac_32)
+[`X86-64`](https://en.wikipedia.org/wiki/X86-64)
+[`X86`](https://en.wikipedia.org/wiki/X86)
+[`Xtensa`](https://en.wikipedia.org/wiki/Tensilica)
+[`Z80`](https://en.wikipedia.org/wiki/Zilog_Z80)
+[`#6502#cc65`](https://github.com/cc65/cc65)
+
 # Licence
 ## The tool
 The `cpu_rec.py` file is licenced under a Apache Licence, Version 2.0.
@@ -117,7 +182,7 @@ and distributed under LGPLv2.
 https://github.com/slavaprokopiy/Mini-TMS320C28346/blob/master/For_user/C28346_Load_Program_to_Flash/Debug/C28346_Load_Program_to_Flash.out
 where it is distributed under an unknown licence.
 - The binary for RISC-V comes from https://riscv.org/software-tools/
-ditributed under GPLv2.
+distributed under GPLv2.
 - The binaries for PIC10 and PIC16 come from http://www.pic24.ru/doku.php/en/osa/ref/examples/intro
 where they are distributed under an unknown licence.
 - The binary for PIC18 comes from https://github.com/radare/radare2-regressions/blob/master/bins/pic18c/FreeRTOS-pic18c.hex
