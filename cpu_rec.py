@@ -260,6 +260,8 @@ class TrainingData(object):
         if os.access(source_corpus, os.R_OK):
             self.build_default_corpus(source_corpus)
             return
+        log.error('No corpus available')
+        sys.exit(1)
     def build_default_corpus(self, basedir):
         # Below, the list of files used to create this default training set
         # and the instructions to load them.
