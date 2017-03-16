@@ -65,7 +65,7 @@ from time import time
 import logging
 log = logging.getLogger("cpu_rec")
 if not len(log.handlers):
-    # When use as a binwalk module, this file is loaded many, many times,
+    # When used as a binwalk module, this file is loaded many, many times,
     # but only one handler should be defined.
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(logging.Formatter("%(levelname)-5s: %(message)s"))
@@ -291,8 +291,6 @@ class TrainingData(object):
         self.add_training('Alpha',         file = basedir+'ELF/alpha/libc-2.7.so.xz')
         self.add_training('HP-PA',         file = basedir+'ELF/hppa/libc-2.3.2.so.xz')
         self.add_training('RISC-V',        file = basedir+'__TODO/elf/guess-number-riscv64')
-        self.add_training('AArch64',       file = basedir+'CROSS_COMPILED/minigzip-aarch64-elf.xz')
-        self.add_training('AArch64',       file = basedir+'CROSS_COMPILED/jpegtran-aarch64-elf.xz')
         self.add_training('ARcompact',     file = basedir+'CROSS_COMPILED/minigzip-arc-elf.xz')
         self.add_training('ARcompact',     file = basedir+'CROSS_COMPILED/jpegtran-arc-elf.xz')
         self.add_training('AVR',           file = basedir+'CROSS_COMPILED/minigzip-avr-elf.xz')

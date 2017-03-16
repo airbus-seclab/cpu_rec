@@ -82,7 +82,6 @@ to data sections.
 [`68HC08`](https://en.wikipedia.org/wiki/Freescale_68HC08)
 [`68HC11`](https://en.wikipedia.org/wiki/Freescale_68HC11)
 [`8051`](https://en.wikipedia.org/wiki/Intel_MCS-51)
-[`AArch64`](https://en.wikipedia.org/wiki/ARM_architecture#AArch64)
 [`Alpha`](https://en.wikipedia.org/wiki/DEC_Alpha)
 [`ARcompact`](https://en.wikipedia.org/wiki/ARC_(processor))
 [`ARM64` `ARMeb` `ARMel` `ARMhf`](https://en.wikipedia.org/wiki/ARM_architecture)
