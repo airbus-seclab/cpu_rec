@@ -22,14 +22,12 @@
 
 
 # Installation instructions:
-#   1. Copy this file in the directory of your choice.
-#   2. Unpack the standard corpus archive cpu_rec_corpus.tar in the same
-#      directory; this will create a cpu_rec_corpus directory with each
-#      corpus file compressed with xz.
-#   3. If you don't have the lzma module installed for your python (this
+#   1. Copy this file and the content of cpu_rec_corpus in the directory
+#      of your choice.
+#   2. If you don't have the lzma module installed for your python (this
 #      tool works either with python3 or with recent python2) then you
 #      should unxz the corpus files.
-#   4. If you want to enhance the corpus, you can add new data in the
+#   3. If you want to enhance the corpus, you can add new data in the
 #      corpus directory. If you want to create your own corpus, please
 #      look at the method 'read_corpus' below.
 
@@ -56,7 +54,7 @@
 #   the possibility of extracting the text section is also used when
 #   building a corpus from full binary files.
 #   Option -d followed by a directory dumps the corpus in that directory;
-#   using this option one can reconstruct the standard corpus archive.
+#   using this option one can reconstruct the default corpus.
 
 
 

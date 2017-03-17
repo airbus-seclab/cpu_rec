@@ -6,14 +6,11 @@ It can be used as a standalone tool, or as a plugin for binwalk
 
 # Installation instructions
 ## Standalone tool
-1. Copy `cpu_rec.py` in the directory of your choice.
-2. Unpack the standard corpus archive `cpu_rec_corpus.tar` in the same
-   directory; this will create a `cpu_rec_corpus` directory with each
-   corpus file compressed with `xz`.
-3. If you don't have the `lzma` module installed for your python (this
+1. Copy `cpu_rec.py` and `cpu_rec_corpus` in the same directory.
+2. If you don't have the `lzma` module installed for your python (this
    tool works either with python3 or with recent python2) then you
-   should `unxz` the corpus files.
-4. If you want to enhance the corpus, you can add new data in the
+   should `unxz` the corpus files in `cpu_rec_corpus`.
+3. If you want to enhance the corpus, you can add new data in the
    corpus directory. If you want to create your own corpus, please
    look at the method `build_default_corpus` in the source code.
 
@@ -45,7 +42,7 @@ the possibility of extracting the text section is also used when
 building a corpus from full binary files.
 
 Option `-d` followed by a directory dumps the corpus in that directory;
-using this option one can reconstruct the standard corpus archive.
+using this option one can reconstruct the default corpus.
 
 # Examples
 Running the tool as a binwalk module typically results in:
@@ -148,11 +145,10 @@ The `cpu_rec.py` file is licenced under a Apache Licence, Version 2.0.
 
 ## The default corpus
 The files in the default corpus have been built from various sources.
-The corpus is a `tar` archive of various compressed files, each compressed
-file is dedicated to the recognition of one architecture.
-Each compressed file is made by the compression of the concatenation
-of one or many binary chunks, which come from various origins and have
-various licences.
+The corpus is a collection of various compressed files, each compressed
+file is dedicated to the recognition of one architecture and is made by
+the compression of the concatenation of one or many binary chunks, which
+come from various origins and have various licences.
 Therefore, the default corpus is a composite document, each sub-document
 (the chunk) being redistributed under the appropriate licence.
 
