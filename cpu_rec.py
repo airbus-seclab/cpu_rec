@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Tested with python2.7 and python3.4
+# Tested with python >= 2.4
 
 # cpu_rec.py is a tool that recognizes cpu instructions
 # in an arbitrary binary file.
@@ -48,7 +48,7 @@
 #   If the result is not satisfying, prepending twice -v to the arguments
 #   makes the tool very verbose; this is helpful when adding a new
 #   architecture to the corpus.
-#   If https://bitbucket.org/LouisG/elfesteem is installed, then the
+#   If https://github.com/airbus-seclab/elfesteem is installed, then the
 #   tool also extract the text section from ELF, PE, Mach-O or COFF
 #   files, and outputs the architecture corresponding to this section;
 #   the possibility of extracting the text section is also used when
@@ -226,8 +226,6 @@ class TrainingData(object):
                 if s.sh.segname == section:
                     return data[s.sh.offset:s.sh.offset+s.sh.size]
         try:
-            # To deal with most COFF files, you should use the last version from
-            # https://bitbucket.org/LouisG/elfesteem
             from elfesteem import pe_init, pe
             e = pe_init.Coff(data)
             if section == 'text': section = '.text'
@@ -529,7 +527,9 @@ class MarkovCrossEntropy(object):
             elif FreqVariant == 'B': self.base_freq[arch] = 1./0x100/self.tbl_size
             for idx, v in self.counts[arch].items():
                 self.Q[arch][idx] = 1.0*v/Qtotal
-        log.info("... %s[%d-grams%s;%s] done in %fs", self.__class__.__name__, length, ('' if modulo is None else 'mod%d'%modulo), FreqVariant, time()-t0)
+        if modulo is None: modulo = ''
+        else:              modulo = 'mod%d'%modulo
+        log.info("... %s[%d-grams%s;%s] done in %fs", self.__class__.__name__, length, modulo, FreqVariant, time()-t0)
     def predict(self, data):
         P = {}
         self.count(data, P, 0)

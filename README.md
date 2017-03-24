@@ -8,7 +8,7 @@ It can be used as a standalone tool, or as a plugin for binwalk
 ## Standalone tool
 1. Copy `cpu_rec.py` and `cpu_rec_corpus` in the same directory.
 2. If you don't have the `lzma` module installed for your python (this
-   tool works either with python3 or with recent python2) then you
+   tool works either with python3 or with python2 >= 2.4) then you
    should `unxz` the corpus files in `cpu_rec_corpus`.
 3. If you want to enhance the corpus, you can add new data in the
    corpus directory. If you want to create your own corpus, please
@@ -35,7 +35,7 @@ If the result is not satisfying, prepending twice `-v` to the arguments
 makes the tool very verbose; this is helpful when adding a new
 architecture to the corpus.
 
-If https://bitbucket.org/LouisG/elfesteem is installed, then the
+If https://github.com/airbus-seclab/elfesteem is installed, then the
 tool also extract the text section from ELF, PE, Mach-O or COFF
 files, and outputs the architecture corresponding to this section;
 the possibility of extracting the text section is also used when
