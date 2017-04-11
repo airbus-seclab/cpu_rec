@@ -25,6 +25,14 @@ provided by https://github.com/devttys0/binwalk/pull/241 .
 ## As a binwalk module
 Add the flag `-%` when using binwalk.
 
+Be patient. Waiting a few minutes for the result is to be expected.
+On my laptop the tool takes 25 seconds and 1 Gb of RAM
+to create the signatures for 70 architectures, and then the analysis
+of a binary takes one minute per Mb.
+If you want the tool to be faster, you can remove some architectures,
+if you know that your binary is not one of them (typically Cray or
+MMIX are not found in a firmware).
+
 ## As a standalone tool
 Just run the tool, with the binary file(s) to analyze as argument(s)
 The tool will try to match an architecture for the whole file, and
@@ -177,7 +185,8 @@ and distributed under LGPLv2.
 https://github.com/slavaprokopiy/Mini-TMS320C28346/blob/master/For_user/C28346_Load_Program_to_Flash/Debug/C28346_Load_Program_to_Flash.out
 where it is distributed under an unknown licence.
 - The binary for RISC-V comes from https://riscv.org/software-tools/
-distributed under GPLv2.
+distributed under GPLv2 and can downloaded at
+https://github.com/radare/radare2-regressions/blob/master/bins/elf/analysis/guess-number-riscv64
 - The binaries for PIC10 and PIC16 come from http://www.pic24.ru/doku.php/en/osa/ref/examples/intro
 where they are distributed under an unknown licence.
 - The binary for PIC18 comes from https://github.com/radare/radare2-regressions/blob/master/bins/pic18c/FreeRTOS-pic18c.hex
