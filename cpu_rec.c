@@ -48,7 +48,7 @@ struct stats count_ngrams(char *filename)
   if (c>1)
     r.m2[ buffer[1] + 256*buffer[0] ] += 1;
   increment(r, buffer, c);
-  while (!feof(f)) {
+  while (c) {
     buffer[0] = buffer[BUFSIZE-2];
     buffer[1] = buffer[BUFSIZE-1];
     c = fread(buffer+2, 1, BUFSIZE-2, f);
