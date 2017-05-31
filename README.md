@@ -43,7 +43,7 @@ If the result is not satisfying, prepending twice `-v` to the arguments
 makes the tool very verbose; this is helpful when adding a new
 architecture to the corpus.
 
-If https://github.com/airbus-seclab/elfesteem is installed, then the
+If https://github.com/LRGH/elfesteem is installed, then the
 tool also extract the text section from ELF, PE, Mach-O or COFF
 files, and outputs the architecture corresponding to this section;
 the possibility of extracting the text section is also used when
