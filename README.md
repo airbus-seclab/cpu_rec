@@ -83,6 +83,18 @@ This is an erroneous detection, due to the fact that
 the IA-64 architecture has statistical properties similar
 to data sections.
 
+## More documentation
+
+The tool has been presented at
+[SSTIC 2017](https://www.sstic.org/2017/presentation/cpu_rec/),
+with a full paper describing why this technique has been used for
+the recognition of architectures. A video of the presentation
+and the slides are available.
+
+This presentation is in French. Please raise an
+[issue](https://github.com/airbus-seclab/cpu_rec/issues/new)
+if you want a translation in English.
+
 # Known architectures in the default corpus
 [`68HC08`](https://en.wikipedia.org/wiki/Freescale_68HC08)
 [`68HC11`](https://en.wikipedia.org/wiki/Freescale_68HC11)
