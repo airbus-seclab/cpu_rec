@@ -244,7 +244,11 @@ class TrainingData(object):
         # we use it.
         default_corpus = basedir+'cpu_rec_corpus'
         if os.access(default_corpus, os.R_OK):
-            for file in os.listdir(default_corpus):
+            files = os.listdir(default_corpus)
+            for file in files:
+                if file.endswith('.corpus.xz') and file[:-3] in files:
+                    log.warning("Both compressed and uncompressed versions of %s: only the uncompressed one is used", file[:-10])
+                    continue
                 for suffix in ('.corpus', '.corpus.xz'):
                     if file.endswith(suffix):
                         self.add_training(file[:-len(suffix)], file = default_corpus+'/'+file, section=None)
