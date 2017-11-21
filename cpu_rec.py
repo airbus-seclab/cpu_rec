@@ -748,15 +748,35 @@ try:
             self.p = FileAnalysis(t)
 
         def scan_file(self, fp):
-            data = TrainingData.unpack_file(super(fp.__class__, fp).read())
+            raw = super(fp.__class__, fp).read()
+            data = TrainingData.unpack_file(raw)
             res, cpu, sz, _, other = self.p.sliding_window(data)
             res = self.p.merge(res, cpu, other)
             pos = 0
             for cpu, cnt in res:
                 if cnt == 0: continue
                 cnt *= 2*sz
-                self.result(offset=pos,file=fp,description="%s (size=%#x)"%(cpu,cnt))
+                self.result(offset=pos,file=fp,description="%s (size=%#x, entropy=%f)"%(cpu,cnt,
+                    self.shannon(raw[pos:pos+cnt])))
                 pos += cnt
+
+        def shannon(self, data):
+            '''
+            Performs a Shannon entropy analysis on a given block of data.
+            This code is copied from binwalk.modules.entropy, to avoid loading the whole module
+            '''
+            if not data:
+                return 0
+            entropy = 0
+            length = len(data)
+            seen = dict(((chr(x), 0) for x in range(0, 256)))
+            for byte in data:
+                seen[byte] += 1
+            for x in range(0, 256):
+                p_x = float(seen[chr(x)]) / length
+                if p_x > 0:
+                    entropy -= p_x * math.log(p_x, 2)
+            return (entropy / 8)
 
 except ImportError:
     pass

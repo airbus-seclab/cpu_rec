@@ -62,19 +62,19 @@ MD5 Checksum:  d006a2a87a3596c744c5573aece81d77
 
 DECIMAL       HEXADECIMAL     DESCRIPTION
 --------------------------------------------------------------------------------
-0             0x0             None (size=0x5800)
-22528         0x5800          PPCel (size=0x4c800)
-335872        0x52000         None (size=0x1000)
-339968        0x53000         IA-64 (size=0x800)
-342016        0x53800         None (size=0x21800)
+0             0x0             None (size=0x5800, entropy=0.620536)
+22528         0x5800          PPCel (size=0x4c800, entropy=0.737337)
+335872        0x52000         None (size=0x1000, entropy=0.720493)
+339968        0x53000         IA-64 (size=0x800, entropy=0.491011)
+342016        0x53800         None (size=0x22000, entropy=0.727501)
 
 Target File:   .../corpus/MSP430/goodfet32.hex
 MD5 Checksum:  4b295284024e2b6a6257b720a7168b92
 
 DECIMAL       HEXADECIMAL     DESCRIPTION
 --------------------------------------------------------------------------------
-0             0x0             MSP430 (size=0x5200)
-20992         0x5200          None (size=0xe00)
+0             0x0             MSP430 (size=0x5200, entropy=0.472185)
+20992         0x5200          None (size=0xe00, entropy=0.467086)
 ```
 
 We can notice that during the analysis of `PPC/NTDLL.DLL`
@@ -82,6 +82,9 @@ a small chunk has been identified as `IA-64`.
 This is an erroneous detection, due to the fact that
 the IA-64 architecture has statistical properties similar
 to data sections.
+
+If the entropy value is above 0.9, it is probably encrypted or compressed
+data, and therefore the result of cpu_rec should be meaningless.
 
 ## More documentation
 
