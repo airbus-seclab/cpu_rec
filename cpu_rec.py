@@ -763,17 +763,17 @@ try:
         def shannon(self, data):
             '''
             Performs a Shannon entropy analysis on a given block of data.
-            This code is copied from binwalk.modules.entropy, to avoid loading the whole module
+            This code is very similar to the function 'shannon' from binwalk.modules.entropy, but it has been modified to work with python3 and 'data' of type 'bytes'.
             '''
             if not data:
                 return 0
             entropy = 0
             length = len(data)
-            seen = dict(((chr(x), 0) for x in range(0, 256)))
+            seen = dict(((x, 0) for x in range(0, 256)))
             for byte in data:
-                seen[byte] += 1
+                seen[byte_ord(byte)] += 1
             for x in range(0, 256):
-                p_x = float(seen[chr(x)]) / length
+                p_x = float(seen[x]) / length
                 if p_x > 0:
                     entropy -= p_x * math.log(p_x, 2)
             return (entropy / 8)
