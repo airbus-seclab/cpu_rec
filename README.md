@@ -99,6 +99,7 @@ This presentation is in French. Please raise an
 if you want a translation in English.
 
 # Known architectures in the default corpus
+[`6502`](https://en.wikipedia.org/wiki/6502)
 [`68HC08`](https://en.wikipedia.org/wiki/Freescale_68HC08)
 [`68HC11`](https://en.wikipedia.org/wiki/Freescale_68HC11)
 [`8051`](https://en.wikipedia.org/wiki/Intel_MCS-51)
@@ -208,3 +209,5 @@ where they are distributed under an unknown licence.
 where it seems to be distributed under GPLv3 (or later).
 - The binary for PIC24 comes from https://raw.githubusercontent.com/mikebdp2/Bus_Pirate/master/package_latest/BPv4/firmware/bpv4_fw7.0_opt0_18092016.hex
 distributed under Creative Commons Zero.
+- The binary for 6502 comes from https://raw.githubusercontent.com/RolfRolles/Atredis2018/master/MemoryDump/data-4000-efff.bin
+and was distributed for the Atredis BlackHat 2018 challenge, under an unknown licence.

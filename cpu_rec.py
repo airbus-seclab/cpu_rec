@@ -426,6 +426,9 @@ class TrainingData(object):
         self.add_training('#6502#cc65',     file = basedir+'CROSS_COMPILED/tu-tea-cc65', repeat=5)
         self.add_training('#6502#cc65',     file = basedir+'CROSS_COMPILED/tu-path-cc65', repeat=5)
         self.add_training('#6502#cc65',     file = basedir+'CROSS_COMPILED/tu-arithmetic-cc65', repeat=5)
+        # Other 6502 binary, downloaded from https://raw.githubusercontent.com/RolfRolles/Atredis2018/master/MemoryDump/data-4000-efff.bin
+        # This is not a lot of data, but seems sufficient
+        self.add_training('6502',  file = basedir+'6502/data-4000-efff.bin', section=slice(0x4000,0x4542), repeat=5)
         # OCaml bytecode, having non-standard statistical properties.
         self.add_training('OCaml',         file = basedir+'OCaml/camlp4')
         log.info("Training set of size %d is read; %s different CPUs known", len(self.archs), len(set([_ for _ in self.archs if not _.startswith('_')])))
