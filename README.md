@@ -117,7 +117,7 @@ if you want a translation in English.
 [`FR-V`](https://en.wikipedia.org/wiki/FR-V_(microprocessor))
 [`FR30`](http://www.fujitsu.com/downloads/MICRO/fma/pdfmcu/hm91101-cm71-10102-2e.pdf)
 [`FT32`](https://en.wikipedia.org/wiki/FTDI)
-[`H8-300`](https://en.wikipedia.org/wiki/H8_Family)
+[`H8-300` `H8S`](https://en.wikipedia.org/wiki/H8_Family)
 [`HP-Focus`](https://en.wikipedia.org/wiki/HP_FOCUS)
 [`HP-PA`](https://en.wikipedia.org/wiki/PA-RISC)
 [`i860`](https://en.wikipedia.org/wiki/Intel_i860)
@@ -211,3 +211,4 @@ where it seems to be distributed under GPLv3 (or later).
 distributed under Creative Commons Zero.
 - The binary for 6502 comes from https://raw.githubusercontent.com/RolfRolles/Atredis2018/master/MemoryDump/data-4000-efff.bin
 and was distributed for the Atredis BlackHat 2018 challenge, under an unknown licence.
+- The binary for H8S comes from https://github.com/airbus-seclab/cpu_rec/issues/4 and was distributed by Dell, under an unknown licence.

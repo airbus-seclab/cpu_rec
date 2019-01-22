@@ -429,6 +429,8 @@ class TrainingData(object):
         # Other 6502 binary, downloaded from https://raw.githubusercontent.com/RolfRolles/Atredis2018/master/MemoryDump/data-4000-efff.bin
         # This is not a lot of data, but seems sufficient
         self.add_training('6502',  file = basedir+'6502/data-4000-efff.bin', section=slice(0x4000,0x4542), repeat=5)
+        # H8S-2117A from https://github.com/airbus-seclab/cpu_rec/issues/4
+        self.add_training('H8S',   file = basedir+'H8S/bridge7757.mot.bin',  section=slice(0x210c,0x1671e))
         # OCaml bytecode, having non-standard statistical properties.
         self.add_training('OCaml',         file = basedir+'OCaml/camlp4')
         log.info("Training set of size %d is read; %s different CPUs known", len(self.archs), len(set([_ for _ in self.archs if not _.startswith('_')])))
