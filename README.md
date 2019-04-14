@@ -94,9 +94,9 @@ with a full paper describing why this technique has been used for
 the recognition of architectures. A video of the presentation
 and the slides are available.
 
-This presentation is in French. Please raise an
-[issue](https://github.com/airbus-seclab/cpu_rec/issues/new)
-if you want a translation in English.
+This presentation was made in French.
+A [translation in English of the slides](doc/cpu_rec_slides_english.pdf) is available,
+a [translation in English of the paper](doc/cpu_rec_sstic_english.md) is in progress.
 
 # Known architectures in the default corpus
 [`6502`](https://en.wikipedia.org/wiki/6502)
