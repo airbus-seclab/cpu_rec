@@ -52,6 +52,21 @@ building a corpus from full binary files.
 Option `-d` followed by a directory dumps the corpus in that directory;
 using this option one can reconstruct the default corpus.
 
+## As a python module
+The function `which_arch` takes a bytestring as input and outputs
+the name of the architecture, or None.
+Loading the training data is done during the first call of which_arch,
+and calling which_arch with no argument does this precomputation only.
+
+For example
+```
+>>> from cpu_rec import which_arch
+>>> which_arch()
+>>> which_arch(b'toto')
+>>> which_arch(open('/bin/sh').read())
+'X86-64'
+```
+
 # Examples
 Running the tool as a binwalk module typically results in:
 ```

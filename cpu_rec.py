@@ -56,6 +56,13 @@
 #   Option -d followed by a directory dumps the corpus in that directory;
 #   using this option one can reconstruct the default corpus.
 
+# How to use the tool as a python module:
+#   from cpu_rec import which_arch
+#   Call which_arch with a bytestring as input; the answer is the name
+#   of the architecture detected, or None.
+#   Loading the training data is done during the first call of which_arch,
+#   and calling which_arch with no argument does this precomputation only.
+
 
 
 import sys, struct, re
@@ -667,6 +674,17 @@ class FileAnalysis(object):
                 continue
             r.append([cp,cn])
         return r
+
+def which_arch(d = None, training = {}):
+    if not 'p' in training:
+        t = TrainingData()
+        t.read_corpus()
+        training['p'] = FileAnalysis(t)
+    if d is None:
+        return None
+    res, r2, r3 = training['p'].deduce(d)
+    return res
+
 
 if __name__ == "__main__":
     fast, dump = False, False
