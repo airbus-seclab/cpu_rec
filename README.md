@@ -153,6 +153,7 @@ a [translation in English of the paper](doc/cpu_rec_sstic_english.md) is in prog
 [`TILEPro`](https://en.wikipedia.org/wiki/TILEPro64)
 [`TLCS-90`](https://en.wikipedia.org/wiki/Toshiba_TLCS#90)
 [`TMS320C2x` `TMS320C6x`](https://en.wikipedia.org/wiki/Texas_Instruments_TMS320)
+[`TriMedia`](https://en.wikipedia.org/wiki/TriMedia_%28mediaprocessor%29)
 [`V850`](https://en.wikipedia.org/wiki/V850)
 [`VAX`](https://en.wikipedia.org/wiki/VAX)
 [`Visium`](https://www.slideshare.net/AdaCore/controls-and-dataservices)
@@ -212,3 +213,4 @@ distributed under Creative Commons Zero.
 - The binary for 6502 comes from https://raw.githubusercontent.com/RolfRolles/Atredis2018/master/MemoryDump/data-4000-efff.bin
 and was distributed for the Atredis BlackHat 2018 challenge, under an unknown licence.
 - The binary for H8S comes from https://github.com/airbus-seclab/cpu_rec/issues/4 and was distributed by Dell, under an unknown licence.
+- The binary for TriMedia comes from https://github.com/crackinglandia/trimedia/blob/master/tm-linux/tmlinux-kernel-obj-latest.tar.bz2 where it is distributed under an unknown licence.

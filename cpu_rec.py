@@ -431,6 +431,8 @@ class TrainingData(object):
         self.add_training('6502',  file = basedir+'6502/data-4000-efff.bin', section=slice(0x4000,0x4542), repeat=5)
         # H8S-2117A from https://github.com/airbus-seclab/cpu_rec/issues/4
         self.add_training('H8S',   file = basedir+'H8S/bridge7757.mot.bin',  section=slice(0x210c,0x1671e))
+        # TriMedia from https://github.com/crackinglandia/trimedia/blob/master/tm-linux/tmlinux-kernel-obj-latest.tar.bz2
+        self.add_training('TriMedia',   file = basedir+'trimedia/linux-obj/fs/built-in.o',  section=slice(0x400,0x400+0x73acf)) # .text section
         # OCaml bytecode, having non-standard statistical properties.
         self.add_training('OCaml',         file = basedir+'OCaml/camlp4')
         log.info("Training set of size %d is read; %s different CPUs known", len(self.archs), len(set([_ for _ in self.archs if not _.startswith('_')])))
