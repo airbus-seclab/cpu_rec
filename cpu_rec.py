@@ -440,6 +440,8 @@ class TrainingData(object):
         self.add_training('H8S',   file = basedir+'H8S/bridge7757.mot.bin',  section=slice(0x210c,0x1671e))
         # TriMedia from https://github.com/crackinglandia/trimedia/blob/master/tm-linux/tmlinux-kernel-obj-latest.tar.bz2
         self.add_training('TriMedia',   file = basedir+'trimedia/linux-obj/fs/built-in.o',  section=slice(0x400,0x400+0x73acf)) # .text section
+        # Nec/Renesas 78k is used in Metz flash units, cf. https://debugmo.de/2011/10/whats-inside-metz-50-af-1-n/
+        self.add_training('78k',        file = basedir+'Metz/MB50AF1_NikonV12.bin',  section=slice(0x2ba,0x2ba+0x7d5a))
         # OCaml bytecode, having non-standard statistical properties.
         self.add_training('OCaml',         file = basedir+'OCaml/camlp4')
         log.info("Training set of size %d is read; %s different CPUs known", len(self.archs), len(set([_ for _ in self.archs if not _.startswith('_')])))

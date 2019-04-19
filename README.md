@@ -179,6 +179,10 @@ a [translation in English of the paper](doc/cpu_rec_sstic_english.md) is in prog
 [`Z80`](https://en.wikipedia.org/wiki/Zilog_Z80)
 [`#6502#cc65`](https://github.com/cc65/cc65)
 
+Because of licencing issues, the following architectures are not in
+the default corpus, but they can be manually added:
+[`78k`](https://en.wikipedia.org/wiki/78K)
+
 # Licence
 ## The tool
 The `cpu_rec.py` file is licenced under a Apache Licence, Version 2.0.
@@ -229,3 +233,6 @@ distributed under Creative Commons Zero.
 and was distributed for the Atredis BlackHat 2018 challenge, under an unknown licence.
 - The binary for H8S comes from https://github.com/airbus-seclab/cpu_rec/issues/4 and was distributed by Dell, under an unknown licence.
 - The binary for TriMedia comes from https://github.com/crackinglandia/trimedia/blob/master/tm-linux/tmlinux-kernel-obj-latest.tar.bz2 where it is distributed under an unknown licence.
+
+## Other architectures that cannot be distributed in the default corpus
+- A binary for Nec/Renesas 78k can be found at https://www.metz-mecatech.de/en/lighting/firmware-download-flash-units/mecablitz-50-af-1-digital.html where it is distributed under a restrictive licence. The file named `MB50AF1_NikonV12.mtz` is a nibble-swapped Intel-HEX firmware (cf. https://debugmo.de/2011/10/whats-inside-metz-50-af-1-n/) with 0x7d5a bytes of 78k code starting at offset 0x2ba.
