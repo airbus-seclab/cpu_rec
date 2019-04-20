@@ -126,6 +126,78 @@ class TrainingData(object):
         self.files.append(file)
         self.data.append(data)
     @staticmethod
+    def unpack_ihex(data):
+        # https://en.wikipedia.org/wiki/Intel_HEX
+        if sys.version_info[0] == 3: lines = data.decode('latin1').split('\n')
+        else: lines = data.split('\n')
+        sorted_lines = []
+        base_address = 0
+        for line in lines:
+            if line.endswith('\r'): line = line[:-1]
+            if len(line) == 0: continue
+            if len(line) < 11: sorted_lines = []; break
+            if line[0] != ':': sorted_lines = []; break
+            if line[1:].strip('0123456789abcdefABCDEF') != '': sorted_lines = []; break
+            count    = line[1:1+2]
+            address  = line[3:3+4]
+            type     = line[7:7+2]
+            content  = line[9:-2]
+            checksum = line[-2:]
+            count    = int(count, 16)
+            address  = int(address, 16)
+            type     = int(type, 16)
+            checksum = int(checksum, 16)
+            if len(content) != 2*count: sorted_lines = []; break
+            for i in range(count+4):
+                checksum += int(line[2*i+1:2*i+3], 16)
+            if checksum % 256 != 0: sorted_lines = []; break
+            if type == 2:
+                # Extended Segment Address
+                base_address = 16*int(content, 16)
+                continue
+            if type == 4:
+                # Extended Linear Address
+                base_address = 65536*int(content, 16)
+                continue
+            if type != 0: continue
+            sorted_lines.append((base_address+address,content))
+        res = []
+        large_chunk = False
+        for address, content in sorted(sorted_lines, key=lambda _:_[0]):
+            if len(res) < address:
+                if address-len(res) > 0x1000000:
+                    if not large_chunk:
+                        log.warning("Intel HEX file has large chunk of zeroes, ignored")
+                    large_chunk = True
+                else:
+                    res.extend([0 for i in range(address-len(res))])
+            elif len(res) > address:
+                log.warning("Intel HEX file decoding not valid")
+            for i in range(len(content)//2):
+                res.append(int(content[2*i:2*i+2], 16))
+        if len(res):
+            data = struct.pack("%dB"%len(res), *res)
+        return data
+    @staticmethod
+    def unpack_chex(data):
+        # ftp://kermit.columbia.edu/kermit/bin/cklxtr.cm
+        # The decoding below is not fully valid, but sufficient for
+        # our statistical analysis
+        if sys.version_info[0] == 3: lines = data.decode('latin1').split('\n')
+        else: lines = data.split('\n')
+        res = []
+        for line in lines:
+            if line.endswith('\r'): line = line[:-1]
+            if len(line) == 0: continue
+            if line[0] == 'Z' and line[1:].strip('0123456789abcdefABCDEF') == '': continue
+            if line.strip('0123456789abcdefABCDEF') != '': res = []; break
+            if len(line) % 2 != 0: res = []; break
+            for i in range(len(line)//2):
+                res.append(int(line[2*i:2*i+2], 16))
+        if len(res):
+            data = struct.pack("%dB"%len(res), *res)
+        return data
+    @staticmethod
     def unpack_file(data):
         """ Sometimes, the file does not contain the raw data, but a compressed/encoded version """
         magic = ( 0xfd,0x37,0x7a,0x58,0x5a )
@@ -139,65 +211,12 @@ class TrainingData(object):
             import zlib
             data = zlib.decompress(data,16+zlib.MAX_WBITS)
         if data.startswith(struct.pack("B",58)):
-            # https://en.wikipedia.org/wiki/Intel_HEX
-            if sys.version_info[0] == 3: lines = data.decode('latin1').split('\n')
-            else: lines = data.split('\n')
-            sorted_lines = []
-            base_address = 0
-            for line in lines:
-                if line.endswith('\r'): line = line[:-1]
-                if len(line) == 0: continue
-                if len(line) < 11: sorted_lines = []; break
-                if line[0] != ':': sorted_lines = []; break
-                if line[1:].strip('0123456789abcdefABCDEF') != '': sorted_lines = []; break
-                count    = line[1:1+2]
-                address  = line[3:3+4]
-                type     = line[7:7+2]
-                content  = line[9:-2]
-                checksum = line[-2:]
-                count    = int(count, 16)
-                address  = int(address, 16)
-                type     = int(type, 16)
-                checksum = int(checksum, 16)
-                if len(content) != 2*count: sorted_lines = []; break
-                for i in range(count+4):
-                    checksum += int(line[2*i+1:2*i+3], 16)
-                if checksum % 256 != 0: sorted_lines = []; break
-                if type == 2:
-                    # Extended Segment Address
-                    base_address = 16*int(content, 16)
-                    continue
-                if type == 4:
-                    # Extended Linear Address
-                    base_address = 65536*int(content, 16)
-                    continue
-                if type != 0: continue
-                sorted_lines.append((base_address+address,content))
-            res = []
-            for address, content in sorted(sorted_lines, key=lambda _:_[0]):
-                for i in range(len(content)//2):
-                    res.append(int(content[2*i:2*i+2], 16))
-            if len(res):
-                data = struct.pack("%dB"%len(res), *res)
+            # Intel HEX
+            data = TrainingData.unpack_ihex(data)
         magic = ( 0x0a,0x5a,0x30,0x31,0x0a ) # \nZ01\n
         if struct.pack("%dB"%len(magic),*magic) in data:
             # C-Kermit HEX
-            # ftp://kermit.columbia.edu/kermit/bin/cklxtr.cm
-            # The decoding below is not fully valid, but sufficient for
-            # our statistical analysis
-            if sys.version_info[0] == 3: lines = data.decode('latin1').split('\n')
-            else: lines = data.split('\n')
-            res = []
-            for line in lines:
-                if line.endswith('\r'): line = line[:-1]
-                if len(line) == 0: continue
-                if line[0] == 'Z' and line[1:].strip('0123456789abcdefABCDEF') == '': continue
-                if line.strip('0123456789abcdefABCDEF') != '': res = []; break
-                if len(line) % 2 != 0: res = []; break
-                for i in range(len(line)//2):
-                    res.append(int(line[2*i:2*i+2], 16))
-            if len(res):
-                data = struct.pack("%dB"%len(res), *res)
+            data = TrainingData.unpack_chex(data)
         return data
     @staticmethod
     def extract_section(data, section=False):

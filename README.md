@@ -88,8 +88,9 @@ MD5 Checksum:  4b295284024e2b6a6257b720a7168b92
 
 DECIMAL       HEXADECIMAL     DESCRIPTION
 --------------------------------------------------------------------------------
-0             0x0             MSP430 (size=0x5200, entropy=0.472185)
-20992         0x5200          None (size=0xe00, entropy=0.467086)
+0             0x0             None (size=0x8000, entropy=0.473132)
+32768         0x8000          MSP430 (size=0x5000, entropy=0.473457)
+53248         0xD000          None (size=0x3000, entropy=0.489337)
 ```
 
 We can notice that during the analysis of `PPC/NTDLL.DLL`
