@@ -183,6 +183,7 @@ a [translation in English of the paper](doc/cpu_rec_sstic_english.md) is in prog
 Because of licencing issues, the following architectures are not in
 the default corpus, but they can be manually added:
 [`78k`](https://en.wikipedia.org/wiki/78K)
+[`TriCore`](https://en.wikipedia.org/wiki/Infineon_TriCore)
 
 # Licence
 ## The tool
@@ -237,3 +238,4 @@ and was distributed for the Atredis BlackHat 2018 challenge, under an unknown li
 
 ## Other architectures that cannot be distributed in the default corpus
 - A binary for Nec/Renesas 78k can be found at https://www.metz-mecatech.de/en/lighting/firmware-download-flash-units/mecablitz-50-af-1-digital.html where it is distributed under a restrictive licence. The file named `MB50AF1_NikonV12.mtz` is a nibble-swapped Intel-HEX firmware (cf. https://debugmo.de/2011/10/whats-inside-metz-50-af-1-n/) with 0x7d5a bytes of 78k code starting at offset 0x2ba.
+- An example of binary for TriCore is the firmware of the ECU of Volkswagen cars. This firmware is distributed under a restrictive licence not allowing redistribution, at https://erwin.volkswagen.de/erwin/showHome.do where it can be downloaded at no cost after the creation of a free account.
