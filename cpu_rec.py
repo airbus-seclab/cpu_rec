@@ -544,6 +544,8 @@ class MarkovCrossEntropy(object):
         elif FreqVariant == 'B': base_count = 0
         # Don't use defaultdict: it takes more memory and is slower
         self.counts = {}
+        self.Q = {}
+        self.base_freq = {}
         for idx, data in enumerate(training.data):
             arch = training.archs[idx]
             if not arch in self.counts:
@@ -555,10 +557,7 @@ class MarkovCrossEntropy(object):
                 ['','','bigrams','trigrams','quadrigrams'][length],
                 arch,
                 training.files[idx])
-        # replace counts by frequencies
-        self.Q = {}
-        self.base_freq = {}
-        for arch in self.counts:
+            # replace counts by frequencies
             Qtotal = base_count * (self.tbl_size-len(self.counts[arch]))
             for v in self.counts[arch].values():
                 assert v != 0
@@ -571,7 +570,7 @@ class MarkovCrossEntropy(object):
         if modulo is None: modulo = ''
         else:              modulo = 'mod%d'%modulo
         log.info("... %s[%d-grams%s;%s] done in %fs", self.__class__.__name__, length, modulo, FreqVariant, time()-t0)
-    def predict(self, data):
+    def count_freq(self, data):
         P = {}
         self.count(data, P, 0)
         # replace counts by frequencies
@@ -580,18 +579,20 @@ class MarkovCrossEntropy(object):
             Ptotal += v
         for idx, v in P.items():
             P[idx] = 1.0*v/Ptotal
+        return P
+    def compute_KL(self, P, Q, base_freq):
+        KLD = 0.0
+        for idx, v in P.items():
+            if v != 0:
+                KLD += v * math.log(v/Q.get(idx, base_freq))
+        return KLD
+    def predict(self, data):
+        P = self.count_freq(data)
         # compute the Kullback-Leibler divergence D(P||Q) for observed P
         # and all pre-computed Q (for each architecture)
         KL = {}
         for arch, Q in self.Q.items():
-            KL[arch] = 0.0
-            for idx, v in P.items():
-                if v == 0:
-                    pass
-                elif idx in Q:
-                    KL[arch] += v * math.log(v/Q[idx])
-                else:
-                    KL[arch] += v * math.log(v/self.base_freq[arch])
+            KL[arch] = self.compute_KL(P, Q, self.base_freq[arch])
         del P
         return sorted([(arch,KL[arch]) for arch in KL],key=lambda _:_[1])
     def dump(self, arch):
