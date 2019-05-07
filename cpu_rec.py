@@ -300,6 +300,8 @@ class TrainingData(object):
                 ('_mask1', struct.pack("16B",*[0xff,0xff,0xff,0x00]*4)*32*1024),
                 ):
             self.add_training(key, data = pattern)
+        self.add_training('_words',        file = basedir+'words')
+        self.add_training('_words_ucs2',   file = basedir+'words_ucs2')
         # A few selected files from Trou's corpus for REDOCS, or cross-compiled
         # as explained in the paper for SSTIC'2017.
         self.add_training('X86',           file = basedir+'ELF/i386/libgmp.so.10.2.0.xz')
@@ -445,7 +447,7 @@ class TrainingData(object):
         # PIC18 from https://github.com/radare/radare2-regressions/blob/master/bins/pic18c/FreeRTOS-pic18c.hex
         self.add_training('PIC18',         file = basedir+'PIC18/FreeRTOS-pic18c.hex', repeat=5)
         # PIC24 from https://raw.githubusercontent.com/mikebdp2/Bus_Pirate/master/package_latest/BPv4/firmware/bpv4_fw7.0_opt0_18092016.hex
-        self.add_training('PIC24',         file = basedir+'PIC24/bpv4_fw7.0_opt0_18092016.hex', repeat=2)
+        self.add_training('PIC24',         file = basedir+'PIC24/bpv4_fw7.0_opt0_18092016.hex', slice=(0x8830,0x1d2e0))
         # 6502 binary compiled with https://github.com/cc65/cc65
         # This appears to be more compiler-dependent than CPU-dependent, the
         # statistics are very different from an AppleII ROM, for example.
@@ -464,7 +466,7 @@ class TrainingData(object):
         # TriCore is used in Volkswagen's ECU, cf. https://debugmo.de/2015/12/dieselgate/
         self.add_training('TriCore',    file = basedir+'Volkswagen/FL_03L906018HK_3533.bin',  section=slice(0xa094c,0x1ea48c))
         # OCaml bytecode, having non-standard statistical properties.
-        self.add_training('OCaml',         file = basedir+'OCaml/camlp4')
+        self.add_training('OCaml',         file = basedir+'OCaml/camlp4',  section=slice(0x1a, 0xec856))
         log.info("Training set of size %d is read; %s different CPUs known", len(self.archs), len(set([_ for _ in self.archs if not _.startswith('_')])))
         log.debug("CPUs known: %s", ', '.join(sorted(list(set([_ for _ in self.archs if not _.startswith('_')])))))
 
@@ -616,16 +618,37 @@ class FileAnalysis(object):
         self.archs = set(t.archs)
         self.m2 = MarkovCrossEntropy(t)
         self.m3 = MarkovCrossEntropy(t, length=3)
+    def heuristic(self, r2, r3, d):
+        # The following heuristics should probably be replaced by the result of
+        # supervised machine learning.
+        if r2[0][0] != r3[0][0]:
+            # bigrams and trigrams disagree, we refuse to output a guess
+            return None
+        res = r2[0][0]
+        if res.startswith('_'):
+            # Recognized as not machine code
+            return None
+        # Special rules, to avoid false recognition for specific architectures
+        if res == 'OCaml' and r2[0][1] > 1:
+            # OCaml bytecode has non-standard statistics for a CPU;
+            # when the CPU is not recognised, or in data sections, very often it is seen as OCaml
+            return None
+        elif res == 'IA-64' and r2[0][1] > 3:
+            # Same for IA-64
+            return None
+        elif res == 'PIC24':
+            # PIC24 code has a 24-bit instruction set. In our corpus it is encoded in 32-bit words,
+            # therefore every four byte is 0x00.
+            zero = [True, True, True, True]
+            for idx in range(len(d)//4):
+                zero = [ zero[i] and byte_ord(d[4*idx+i]) == 0 for i in range(4) ]
+                if not True in zero:
+                    return None
+        return res
     def deduce(self, d):
         r2 = self.m2.predict(d)
         r3 = self.m3.predict(d)
-        res = None
-        if r2[0][0] == r3[0][0]: res = r2[0][0]
-        # OCaml bytecode has non-standard statistics for a CPU;
-        # when the CPU is not recognised, or in data sections, very often it is seen as OCaml
-        if res == 'OCaml' and r2[0][1] > 1: res = None
-        if res is not None and res.startswith('_'): res = None
-        return res, r2, r3
+        return self.heuristic(r2, r3, d), r2, r3
     def window(self, d, sz):
         res = [[None,0]]
         # For each chunk, we remember some other possible architectures,
@@ -634,8 +657,8 @@ class FileAnalysis(object):
         for i in range(len(d)//sz):
             r, r2, r3 = self.deduce(d[sz*i:sz*(i+2)])
             other.append([a for a,_ in r2[:2]]+[a for a,_ in r3[:2]])
-            log.debug("      %#10x   %s", sz*i, r2[:4])
-            log.debug("      %10s   %s", '', r3[:4])
+            log.debug("      %#10x   %-10s %s", sz*i, r, r2[:4])
+            log.debug("      %10s   %-10s %s", '', '', r3[:4])
             if r == res[-1][0]:
                 res[-1][1] += 1
             else:
