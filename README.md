@@ -160,6 +160,7 @@ a [translation in English of the paper](doc/cpu_rec_sstic_english.md) is in prog
 [`CLIPPER`](https://en.wikipedia.org/wiki/Clipper_architecture)
 [`CompactRISC`](https://en.wikipedia.org/wiki/CompactRISC)
 [`Cray`](https://en.wikipedia.org/wiki/Cray)
+[`CUDA`](https://en.wikipedia.org/wiki/CUDA)
 [`Epiphany`](https://en.wikipedia.org/wiki/Adapteva)
 [`FR-V`](https://en.wikipedia.org/wiki/FR-V_(microprocessor))
 [`FR30`](http://www.fujitsu.com/downloads/MICRO/fma/pdfmcu/hm91101-cm71-10102-2e.pdf)
@@ -266,6 +267,7 @@ distributed under Creative Commons Zero.
 and was distributed for the Atredis BlackHat 2018 challenge, under an unknown licence.
 - The binary for H8S comes from https://github.com/airbus-seclab/cpu_rec/issues/4 and was distributed by Dell, under an unknown licence.
 - The binary for TriMedia comes from https://github.com/crackinglandia/trimedia/blob/master/tm-linux/tmlinux-kernel-obj-latest.tar.bz2 where it is distributed under an unknown licence.
+- The binary for CUDA comes from http://jcuda.org/samples/matrixInvert%200.0.1%20CUBIN%2032bit.zip where it is distributed under a MIT licence.
 - The reference for statistics of ASCII text comes from https://users.cs.duke.edu/~ola/ap/linuxwords with all LF replaced with NULL bytes.
 
 ## Other architectures that cannot be distributed in the default corpus
