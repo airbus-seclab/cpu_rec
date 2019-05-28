@@ -71,6 +71,19 @@ For example
 'X86-64'
 ```
 
+## Create a corpus or extend the existing corpus
+Each architecture is defined by a file in `cpu_rec_corpus`.
+Only file names ending with `.corpus`, which can be compressed with `xz`.
+
+The corpus file shall contain instructions for the target architecture.
+As you can see in `build_default_corpus`, most of the default corpus has
+been created by extracting the TEXT section of an executable.
+
+If you want to add an new architecture (e.g. 78k as described below)
+then you have to find a binary, and extract the executable section
+(the command line to extract the 78k code from the Metz firmware is
+`dd if=MB50AF1_NikonV12.bin of=Nec78k.corpus bs=1 skip=0x2ba count=0x7d5a`).
+
 # Examples
 Running the tool as a binwalk module typically results in:
 ```
