@@ -218,6 +218,7 @@ a [translation in English of the paper](doc/cpu_rec_sstic_english.md) is in prog
 [`V850`](https://en.wikipedia.org/wiki/V850)
 [`VAX`](https://en.wikipedia.org/wiki/VAX)
 [`Visium`](https://www.slideshare.net/AdaCore/controls-and-dataservices)
+[`WASM`](https://en.wikipedia.org/wiki/WebAssembly)
 [`WE32000`](https://en.wikipedia.org/wiki/Bellmac_32)
 [`X86-64`](https://en.wikipedia.org/wiki/X86-64)
 [`X86`](https://en.wikipedia.org/wiki/X86)
@@ -281,6 +282,7 @@ and was distributed for the Atredis BlackHat 2018 challenge, under an unknown li
 - The binary for H8S comes from https://github.com/airbus-seclab/cpu_rec/issues/4 and was distributed by Dell, under an unknown licence.
 - The binary for TriMedia comes from https://github.com/crackinglandia/trimedia/blob/master/tm-linux/tmlinux-kernel-obj-latest.tar.bz2 where it is distributed under an unknown licence.
 - The binary for CUDA comes from http://jcuda.org/samples/matrixInvert%200.0.1%20CUBIN%2032bit.zip where it is distributed under a MIT licence.
+- The binary for WebAssembly comes from https://github.com/mdn/webassembly-examples/blob/master/wasm-sobel/change.wasm where it is distributed under a CC Zero licence.
 - The reference for statistics of ASCII text comes from https://users.cs.duke.edu/~ola/ap/linuxwords with all LF replaced with NULL bytes.
 
 ## Other architectures that cannot be distributed in the default corpus

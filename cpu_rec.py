@@ -460,6 +460,8 @@ class TrainingData(object):
         # CUDA from http://jcuda.org/samples/matrixInvert%200.0.1%20CUBIN%2032bit.zip
         # Not a lot of data either
         self.add_training('CUDA',       file = basedir+'CUDA/kernels32/GPUeliminateRest_kernel.cubin',  section=slice(0x477,0x477+0xaa0), repeat=5)
+        # WebAssembly from https://github.com/mdn/webassembly-examples/blob/master/wasm-sobel/change.wasm
+        self.add_training('WASM',       file = basedir+'WASM/change.wasm')
         # H8S-2117A from https://github.com/airbus-seclab/cpu_rec/issues/4
         self.add_training('H8S',   file = basedir+'H8S/bridge7757.mot.bin',  section=slice(0x210c,0x1671e))
         # TriMedia from https://github.com/crackinglandia/trimedia/blob/master/tm-linux/tmlinux-kernel-obj-latest.tar.bz2
