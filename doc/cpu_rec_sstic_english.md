@@ -181,67 +181,57 @@ If you like exotic architectures that are not in the scope of `cpu_rec`, you may
 
 # Appendix: experimentations with statistical learning
 
-__LATEX SOURCE IN FRENCH - TO BE TRANSLATED LATER__
+During the development of `cpu_rec` I experimented the other methods described below, which were less efficient than the method retained for publication.
 
-Lors de la conception de \texttt{cpu\_rec.py}, j'ai expérimenté avec les quelques autres méthodes ci-dessous,
-qui sont moins efficaces en pratique que la méthode retenue.
+## Other machine learning techniques
+Rather than using directly the Multinomial Naive Bayes technique, it is usually recommended to compensate the differences in corpus size by using for example a TF-IDF transform.
+Experiments showed that the recognition capability of the tool is diminished a lot by using TF-IDF.
+The technique I have used (manual repetition of training data for architectures with very small corpus) is sufficient to avoid the bad consequences of adding a new architecture with small corpus.
 
-\paragraph{Autres techniques d'apprentissage.}
-Au lieu d'utiliser directement la technique \emph{Multinomial Naive Bayes}, il est habituellement recommandé de compenser les différences de taille de corpus en utilisant par exemple une transformation TF-IDF. En pratique cela a beaucoup diminué la capacité de reconnaissance de l'outil, et la technique utilisée (répétition manuelle des entrées pour les architectures ayant un trop petit corpus) permet d'éviter la plupart des effets nocifs au moment de l'ajout d'une nouvelle architecture.
+Other classifiers have been tested than Multinomial Naive Bayes, and none gave better results.
+Nevertheless, it is very likely that in the hundreds of existing classification techniques, there are some that will perform better than what `cpu_rec` is doing.
+But the very small size of corpus available for some exotic architectures is an explanation why common classification techniques don't perform well.
 
-D'autres classifieurs ont été testés et n'ont pas donné de meilleurs résultats.
-Néanmoins, il est probable que parmi les nombreux outils de classification existants, certains seront plus performant que celui utilisé par \texttt{cpu\_rec.py}.
-Et si le corpus sur lequel apprendre les architectures exotiques était plus large, ces méthodes pourraient devenir intéressantes.
+## Statistics modulo 4
+32-bit RISC architectures have 4-octets long instructions, aligned on addresses that are multiple of 4. This property could be used.
+But neither using 4-grams, nor computing statistics that depend on the position modulo 4, give better results than the current tool, mainly because it needs a sliding window larger than what we can afford in our context.
 
-\paragraph{Statistiques modulo 4.}
-Les architectures RISC 32-bits ont toutes leurs instructions de longueur 4 octets et alignées sur des adresses multiples de 4.
-Mais l'utilisation de 4-grammes, ou bien le calcul de statistiques différentes selon l'adresse modulo 4, ne donnent pas de meilleurs résultats que l'outil actuel, en particulier parce que cela demande que la fenêtre glissante soit plus longue que ce qui est permis par les statistiques de bigrammes et trigrammes. 
+## Detecting RISC architectures
+On idea to detect if the instructions have all the same length `n` is to compute the statistical distributions of values having the same address modulo `n`. If these distributions differ, then it is likely that the length of instructions divides `n`.
 
-\paragraph{Détection d'architecture RISC.}
-Pour détecter si la longueur des instructions est $n$, on peut calculer la distribution des $n$ sous-ensembles contenant les octets dont l'adresse a une valeur fixée modulo $n$. Si les distributions de ces $n$ sous-ensembles sont suffisamment différentes, alors il est probable que la longueur des instructions soit un diviseur de $n$.
+This approach is very efficient to detect 32-bit RISC architectures, if the *text* section has been isolated.
+In practice, it would only be useful to detect an unknown 32-bit RISC architecture, and most of the work is still to be done.
 
-Cette approche marche assez bien pour détecter si une architecture est RISC 32-bits, pourvu qu'on sache isoler la section de texte.
-Donc en pratique cette technique n'apporte pas grand chose, d'autant plus qu'elle ne permet pas de savoir plus précisément quelle est l'architecture.
+## Looking for atypical patterns
+Some 3-octet or 4-octet sequences, or some other specific patterns are unique to a given architecture.
+Usual examples are sequences of instructions used at the beginning or the end of a function.
+One way to find these sequences is by statistical analysis of the corpus.
+Below are some sequences that allow to recognize some architectures with high confidence
+(even if IA-64 patterns generate false positives in data section, because they have two null octets):
+```
+55 89 e5      X86     push %ebp; mov %esp,%ebp
+55 57 56      X86     push %ebp; push %edi; push %esi
+41 57 41 56   X86-64  push %r15; push %r14
+41 55 41 54   X86-64  push %r13; push %r12
+55 48 89 e5   X86-64  push %rbp; mov %rsp,%rbp
+0e f0 a0 e1   ARMel   ret     (generated by gcc 4.x)
+1e ff 2f e1   ARMel   bx lr   (generated by gcc 3.x)
+6b c2 3f d9   HP-PA   stw %rp, -cur_rp(%sp)
+4e 5e 4e 75   M68k    unlk a6; rts
+ff bd 67      MIPSel  daddiu $sp, -X
+ff bd 27      MIPSel  addiu $sp, -X
+67 bd ff      MIPSeb  diaddu $sp, -X
+67 bd 00      MIPSeb  diaddu $sp, +X
+03 99 e0 21   MIPSeb  addu $gp, $t9
+4e 80 00 20   PPCeb   blr
+81 c3 e0 08   sparc   retl
+60 00 80 00   IA-64   br.few b6
+08 00 84 00   IA-64   br.ret.sptk.many b0
+```
 
-\paragraph{Recherche de motifs atypiques.}
-Certaines séquences de 3 ou 4 octets, ou certains motifs spécifiques, sont caractéristiques d'une architecture.
-En général, ce sont des séquences de prologue ou de fin de fonction.
-De telles séquences se trouvent par exemple au moyen d'une analyse statistique du corpus.
-En voici quelques unes, qui permettent de reconnaître certaines architectures avec grande fiabilité
-(même si les motifs IA-64 engendrent des faux positifs en particulier dans les sections de données, puisqu'ils ont deux octets nuls) :
-
-\begin{center}
-\begin{tabular}{|@{\tt}l|@{\tt}l|l|}
-\hline
-55 89 e5 & X86 & \verb|push %ebp; mov %esp,%ebp| \\
-55 57 56 & X86 & \verb|push %ebp; push %edi; push %esi| \\
-41 57 41 56 & X86-64 & \verb|push %r15; push %r14| \\
-41 55 41 54 & X86-64 & \verb|push %r13; push %r12| \\
-55 48 89 e5 & X86-64 & \verb|push %rbp; mov %rsp,%rbp| \\
-0e f0 a0 e1 & ARMel & \verb|ret|    (typique de gcc 4.x) \\
-1e ff 2f e1 & ARMel & \verb|bx lr|   (typique de gcc 3.x) \\
-6b c2 3f d9 & HP-PA & \verb|stw %rp, -cur_rp(%sp)| \\
-4e 5e 4e 75 & M68k & \verb|unlk a6; rts| \\
-ff bd 67 & MIPSel & \verb|daddiu $sp, -X| \\
-ff bd 27 & MIPSel & \verb|addiu $sp, -X| \\
-67 bd ff & MIPSeb & \verb|diaddu $sp, -X| \\
-67 bd 00& MIPSeb & \verb|diaddu $sp, +X| \\
-03 99 e0 21& MIPSeb & \verb|addu $gp, $t9| \\
-4e 80 00 20 & PPCeb & \verb|blr| \\
-81 c3 e0 08 & sparc & \verb|retl| \\
-60 00 80 00 & IA-64 & \verb|br.few b6| \\
-08 00 84 00 & IA-64 & \verb|br.ret.sptk.many b0| \\
-%X 00 bb 27 Y Z bd 23 & alpha & \verb|ldah $gp, X($27); lda $gp, YZ($gp)| \\
-\hline
-\end{tabular}
-\end{center}
-
-Cette approche permet d'avoir une réponse plus vite que \texttt{cpu\_rec.py}, mais elle est moins générale :
-le calcul de distances entre distributions de trigrammes permet d'utiliser automatiquement le fait que sur x86 la séquence \texttt{55 89 e5} est bien plus probable que pour les autres architectures, mais si le compilateur utilisé ne produit pas les instructions \verb|push %ebp; mov %esp,%ebp|,
-alors les autres motifs fréquents seront automatiquement pris en compte.
-
-Ceci se voit par exemple pour la reconnaissance de l'ARMel (little-endian) pour laquelle le corpus de \texttt{cpu\_rec.py} est construit en utilisant uniquement un binaire compilé avec gcc 3.x, mais permet de reconnaître les binaires compilés avec gcc 4.x, bien que la plupart d'entre eux ne contienne aucune instruction \verb|bx lr|.
-
+This approach gives faster results than using `cpu_rec` but it is not as generic.
+For example, because `cpu_rec` uses the probabilities of trigrams, the pattern `55 89 e5` above is automatically taken into account as specific to X86, but if the compiler that was used never produced a `push %ebp; mov %esp,%ebp` then `cpu_rec` will use other elements and recognise the architecture anyway.
+A concrete example is ARMel recognition, where the corpus used by `cpu_rec` was compiled by gcc 3.x only, but it is sufficient to regognize binaries compiled with gcc 4.x, which don't contain the instruction `bx lr`.
 
 
 # Appendix: how cpu_rec corpus was built
