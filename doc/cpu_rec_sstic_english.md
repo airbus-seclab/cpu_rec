@@ -236,115 +236,95 @@ A concrete example is ARMel recognition, where the corpus used by `cpu_rec` was 
 
 # Appendix: how cpu_rec corpus was built
 
-__LATEX SOURCE IN FRENCH - TO BE TRANSLATED LATER__
+The corpus is probably the most important element of `cpu_rec`, and collecting this corpus has been most of the work. Because of the difficulty to find samples of binaries from exotic architectures, the tool has been designed such that only short samples are necessary, a few hundreds of kilobytes only.
 
-Le corpus est un élément essentiel de \texttt{cpu\_rec.py} :
-l'outil a été conçu pour pouvoir apprendre chance nouvelle architecture avec seulement
-quelques centaines de Ko, mais l'intérêt de l'outil réside en sa capacité à reconnaître des
-architectures inhabituelles.
+The method `build_default_corpus` in `cpu_rec.py` can build the corpus from the source files.
+These source files are not provided with the tool, but the description below explains how they were chosen.
 
-C'est pour cela que la constitution du corpus est détaillée,
-et que des extensions de ce corpus sont bienvenues.
-\subsection{Binaires divers}
-Pour diverses architectures, le corpus se base sur quelques un des fichiers
-ELF fournis par Raphaël Rigo (un fichier par architecture, c'est suffisant) ;
-l'apprentissage est fait sur la section de code exécutable\footnote
-{La section de code exécutable s'appelle normalement
-\texttt{.text} en COFF, PE et ELF,
-et \texttt{\_\_TEXT,\_\_text} en Mach-O.
-Ces noms sont des conventions, un exécutable valide pourrait utiliser d'autres noms.
-Les binaires utilisés pour le corpus respectent cette convention.}.
-Ce sont des versions de \texttt{libgmp.so}, \texttt{libm.so} ou \texttt{libc.so}
-issues de diverses distributions Debian
-(pour x86, x86\_64, m68k, PowerPC, S/390, SPARC, Alpha, HP-PA, MIPS et quelques variantes de ARM ;
-le code source correspondant à ces binaires est sur \url{http://archive.debian.org/})
-ou bien un busybox
-(pour ARM big endian et SH-4,
-binaires disponibles sur \url{https://busybox.net/downloads/binaries/}).
+Any addition to the corpus is welcome!
 
-Pour d'autres architectures, de nombreux binaires sont
-disponibles sur \url{ftp://kermit.columbia.edu/kermit/bin/} :
-cela a permis d'enrichir le corpus avec
-M88k, HP-Focus, Cray, Vax, PDP-11, ROMP, WE32k, CLIPPER, i860.
-Certains de ces fichiers sont au format COFF, qui indique où est la section .text,
-pour d'autres il a fallu utiliser l'outil \texttt{cpu\_rec.py} en mode verbeux pour
-en déduire où est le code exécutable.
-Le corpus utilise aussi un firmware pour TMS320C2x fourni par Raphaël Rigo,
-au format COFF, issu de \url{https://github.com/slavaprokopiy/Mini-TMS320C28346/blob/master/For_user/C28346_Load_Program_to_Flash/Debug/C28346_Load_Program_to_Flash.out}.
+## Various binaries found on the web
+### Origin of the binaries
+As mentioned in the introduction, a corpus of various binaries was provided by Airbus Group Innovations for REDOCS2016.
+In this corpus, there were many ELF binaries. Some of them have been selected to train the tool for the most common architectures. They are the 'ELF' lines in `build_default_corpus`.
+These files are some versions of `libgmp.so`, `libm.so`, or `libc.so` from Debian distributions for x86, x86_64, m68k, PowerPC, S/390, SPARC, Alpha, HP-PA, MIPS and some variants of ARM.
+Note that the source code of these binaries is available at http://archive.debian.org/.
+The method `add_training` used in `build_default_corpus` extract the `.text` section of the ELF library, using https://github.com/airbus-seclab/elfesteem
+In this corpus, there were also `busybox` executables, which have been used for two architectures: ARM big endian and SH-4. Busybox binaries are available at https://busybox.net/downloads/binaries/
 
-Pour presque toutes ces architectures, un unique binaire a été utilisé pour faire partie du corpus.
-Cela peut paraître audacieux de ne pas utiliser de nombreux binaires variés, quand ils sont disponibles,
-mais en pratique cela n'est en général pas nécessaire, et cela permet de valider que l'approche statistique
-utilisée par \texttt{cpu\_rec.py} sera valide même dans les cas où un seul binaire a pu être trouvé.
-Un exemple est l'architecture CLIPPER, apprise à partir d'un unique binaire (celui de C-Kermit),
-et détectée dans les fichiers \texttt{boot.1} de \url{https://web-docs.gsi.de/~kraemer/COLLECTION/INTERGRAPH/starfish.osfn.org/Intergraph/index.html}.
-% aka. http://web.archive.org/web/20041109140051/http://starfish.osfn.org/Intergraph/floppies/
-% Les fichiers "boot.1" files are identified as having CLIPPER instructions, the "root.n" files are of unknown content,
-% probably compressed or encrypted data (high entropy in the whole file).
+For less common architectures, ftp://kermit.columbia.edu/kermit/bin/ includes many binaries. This has been used to add to the corpus M88k, HP-Focus, Cray, Vax, PDP-11, ROMP, WE32k, CLIPPER, and i860.
+Some of the C-Kermit binaries are in COFF format, and elfesteem can extract the .text section; some other binaries are in undocumented formats, and finding where is the executable code has been manually done by analyzing the output of `cpu_rec` in verbose mode. This results in the `section=slice(a,b)` argument of `add_training`.
 
+For TMS320C2x, the REDOCS2016 contained a firmware in COFF format, which can be downloaded at https://github.com/slavaprokopiy/Mini-TMS320C28346/blob/master/For_user/C28346_Load_Program_to_Flash/Debug/C28346_Load_Program_to_Flash.out
 
-\subsection{Cross-compilateur pour les architectures connues de \protect\texttt{gcc.gnu.org}}
-La première étape est d'installer les binutils et le compilateur.
-Les instructions ci-dessous ont fonctionné sous MacOSX,
-et devraient aussi fonctionner aussi sous Linux
-(à quelques modifications de path près).
+### Why usually only one binary is sufficient
+For almost all the architectures mentioned above, a unique binary has been used to generate the corpus.
+This is not the way machine learning techniques are supposed to work, but in the context of `cpu_rec` we cannot make the assumption that more than one binary will be available for the corpus.
+Using only one binary even when many binaries are available (e.g. x86) validates the efficiency of `cpu_rec` on exotic architectures.
 
-Les architectures connues du gcc de \texttt{gcc.gnu.org} sont :
-\texttt{aarch64} % OK
-\texttt{alpha}
-\texttt{arc} % OK
-\texttt{arm}
-\texttt{avr} % OK
-\texttt{bfin} % OK
-\texttt{c6x} % OK, bug of gcc when building libjpeg
-\texttt{cr16} % OK, bug of gcc when building libjpeg
-\texttt{cris} % OK
-\texttt{epiphany} % OK
-\texttt{fr30} % OK
-\texttt{frv} % OK
-\texttt{ft32} % OK
-\texttt{h8300} % OK
-\texttt{i386}
-\texttt{ia64} % OK
-\texttt{iq2000} % OK
-\texttt{lm32} % OK
-\texttt{m32c} % OK
-\texttt{m32r} % OK
-\texttt{m68k}
-\texttt{mcore} % OK
-\texttt{microblaze} % OK
-\texttt{mips} % OK
-\texttt{mmix} % OK, with TARGET=mmix (not mmix-elf)
-\texttt{mn10300} % OK
-\texttt{moxie} % OK
-\texttt{msp430} % OK, but fails making valid executables
-\texttt{nds32be} % OK
-\texttt{nds32le} % OK, very similar to BE version
-\texttt{nios2} % OK
-\texttt{nvptx} % OK, but does not generate binaries, only "assembler"
-\texttt{pa}
-\texttt{pdp11} % KO
-\texttt{rl78} % OK
-\texttt{rs6000}
-\texttt{rx} % OK
-\texttt{s390}
-\texttt{sh} % OK, but fails in generating divisions
-\texttt{sparc}
-\texttt{spu} % OK
-\texttt{tilegx} % KO
-\texttt{tilepro} % OK, but many bugs
-\texttt{v850} % OK
-\texttt{visium} % OK
-\texttt{xstormy16} % OK
-\texttt{xtensa} % OK
-mais la création d'un cross-compilateur avec la recette ci-dessous échoue
-pour quelques-unes\footnote
-{\texttt{mmix} : il faut utiliser \texttt{TARGET=mmix} et non pas \texttt{TARGET=mmix-elf} ;\\
-\texttt{pdp11} : bug au moment de la création de l'assembleur ;\\
-\texttt{tilegx} : bug pour la création de gcc (fichier \texttt{tilepro/gen-mul-tables.cc} invalide).}.
+As mentioned above, ARMel code generated with gcc 4.x is very different from ARMel code generated by gcc 3.x, e.g. returning from a function uses a differnet instruction. The corpus is trained with one libgmp compiled with gcc 3.x, yet the tool can easily recognize binaries compiled with gcc 4.x.
+Another example is the CLIPPER architecture, where `cpu_rec` is trained on one binary from C-Kermit, and can detect that `boot.1` file from https://web-docs.gsi.de/~kraemer/COLLECTION/INTERGRAPH/starfish.osfn.org/Intergraph/index.html is containing CLIPPER instructions.
 
-\begin{footnotesize}
-\begin{verbatim}
+## Cross-compiled binaries for architectures known by gcc.gnu.org
+The REDOC2016 corpus did not contain examples for all architectures known by gcc.
+Small open-source projects have been cross-compiled, and the result is the 'CROSS_COMPILED' lines in `build_default_corpus`.
+
+### Installing a cross-compilation environment
+There are many architectures known to the gcc compiler at gcc.gnu.org, and for some of them building the cross-compiler has not been straightforward.
+```
+aarch64      OK
+alpha      
+arc          OK
+arm      
+avr          OK
+bfin         OK
+c6x          OK, bug of gcc when building libjpeg
+cr16         OK, bug of gcc when building libjpeg
+cris         OK
+epiphany     OK
+fr30         OK
+frv          OK
+ft32         OK
+h8300        OK
+i386      
+ia64         OK
+iq2000       OK
+lm32         OK
+m32c         OK
+m32r         OK
+m68k      
+mcore        OK
+microblaze   OK
+mips         OK
+mmix         OK, with TARGET=mmix (not mmix-elf)
+mn10300      OK
+moxie        OK
+msp430       OK, but fails making valid executables
+nds32be      OK
+nds32le      OK, very similar to BE version
+nios2        OK
+nvptx        OK, but does not generate binaries, only "assembler"
+pa      
+pdp11        KO, cannot generate pdp11 assembly
+rl78         OK
+rs6000      
+rx           OK
+s390      
+sh           OK, but fails in generating divisions
+sparc      
+spu          OK
+tilegx       KO, tilepro/gen-mul-tables.cc is invalid
+tilepro      OK, but many bugs
+v850         OK
+visium       OK
+xstormy16    OK
+xtensa       OK
+```
+
+My main computer was running MacOSX, but the same approach should work with Linux.
+The first step is to install binutils and the compiler, with the following instructions:
+
+```
 export PREFIX=$BASEDIR/cross
 export PATH="$PREFIX/bin:$PATH"
 mkdir -p $BASEDIR/corpus $PREFIX
@@ -371,37 +351,21 @@ make all-gcc
 make all-target-libgcc
 make install-gcc
 make install-target-libgcc
-\end{verbatim}
-\end{footnotesize}
+```
 
+Once binutils and gcc have been installed, it is not sufficient to compile a complete software (e.g. zlib) because no libc has been installed.
 
+The standard approach for cross-compilation is to install additional elements, that depend on the target architecture. These can be libgloss of libnosys. https://github.com/32bitmicro/newlib-nano-1.0/ contains many interesting elements.
+Sometimes the target architecture has no FPU, and therefore functions such as `__divsf3` need to be provided, either by a libm or a libc.
 
-Les binutils et gcc ne suffisent pas pour compiler la zlib par exemple,
-car il manque en particulier la libc. Seuls des programmes sans aucune
-dépendance sont compilables.
+I did not follow the standard approach, I generated empty stubs. This allows to be able to cross-compile executables for architectures unknown of newlib, e.g. H8/300 or FTDI FT32.
 
-L'approche habituelle est d'installer d'autres éléments,
-selon l'architecture visée, par exemple la libgloss ou la libnosys
-(\url{https://github.com/32bitmicro/newlib-nano-1.0/} est un bon point d'entrée).
-Parfois l'absence de FPU demande qu'existent des fonctions
-telles que \verb|__divsf3|, qui selon les architectures seront
-dans la libm ou la libgcc.
+### Cross-compiling zlib and libjpeg
+These two software have been chosen because they mainly do computations, and therefore don't interact much with the operating system.
+The command line to be used for cross-compiling depends on the software to compile, and only one binary for each software has been used in the corpus: minigzip for zlib, and jpegtran for libjpeg.
 
-Au lieu de suivre cette approche, j'ai créé des stubs vides,
-ce qui a permis de directement gérer des architectures non connues
-de la newlib, telles que H8/300 ou FTDI FT32.
-
-\subsection{Cross-compilation de zlib et libjpeg}
-Ce sont des bibliothèques plutôt calculatoires, donc avec peu d'adhérence au système
-d'exploitation, ce qui en fait de bonnes candidates pour une création de corpus
-d'instructions d'un CPU.
-
-Les lignes de commande pour une cross-compilation dépendent un peu de la bibliothèque
-à compiler. On utilise pour le corpus les exécutables produits : minigzip et jpegtran.
-Par exemple pour V850 cela donne :
-
-\begin{footnotesize}
-\begin{verbatim}
+A typical cross-compilation, for V850, is:
+```
 TARGET=v850-elf
 
 ZLIB=zlib-1.2.10
@@ -421,148 +385,87 @@ CC="$TARGET-gcc $CFLAGS" ./configure
 make clean
 make AR="$TARGET-ar rc" AR2="$TARGET-ranlib"
 cp jpegtran .../jpegtran-$TARGET
-\end{verbatim}
-\end{footnotesize}
+```
 
-Dans plusieurs cas (c6x, cr16, epiphany, rl78, tilepro) en suivant la procédure ci-dessus, on tombe sur des bugs
-du cross-compilateur gcc (\emph{internal error} ou \emph{SEGV} -- les bug reports restent à faire)
-qui peuvent être contournés en modifiant le source de zlib ou libjpeg.
-De plus, les exécutables cross-compilés pour RL78 ou MSP430 (avec \texttt{-mlarge})
-ont une section .text inutilisable et le corpus ne peut se baser sur minigzip et jpegtran.
-À la place, il se base sur les sections .text des fichiers objet engendrés.
+In some cases (c6x, cr16, epiphany, rl78, tilepro) the above procedure does not work, because the gcc compiler fails with `internal error` or `SEGV`.
+These bugs can be avoided by modifying the source code of zlib or libjpeg to remove what triggers the bug.
+In addition, when building executables for RL78 ou MSP430 (with option `-mlarge`) the result does not have a valid .text section. Object files have been used for the corpus, instead of the executable.
 
-\subsection{Autres cross-compilateurs}
-Il existe quelques cross-compilateurs basés sur gcc mais disponibles ailleurs que sur \texttt{gcc.gnu.org},
-par exemple la toolchain gcc/newlib disponible sur \url{https://riscv.org/software-tools/},
-dont un binaire a rejoint le corpus pour l'architecture RISC-V.
-% binaire compilé par on ne sait qui, pour résoudre le CTF risky de Hitcon'15
+All these elements appear in the relevant `add_training` line in `build_default_corpus`.
 
-\medskip
-Mais pour de nombreux microprocesseurs 8-bits, non seulement le gcc de \texttt{gcc.gnu.org} ne sait pas
-faire de cross-compilation, mais comme ces microprocesseurs ont un espace mémoire limité,
-on ne peut y faire tenir la zlib ou la libjpeg.
-Il faut donc procéder autrement.
-Au lieu de compiler une bibliothèque entière, on se limite à de petits programmes.
-Pour construire le corpus, principalement trois ont été utilisés ; ça n'est pas suffisant
-pour avoir une détection de CPU de bonne qualité, mais cela suffit à prouver la
-validité de l'approche.
+## Other cross-compilers
+There exist cross-compilers based on gcc but not available at gcc.gnu.org.
+One example the the gcc+newlib toolchain available at https://riscv.org/software-tools/
+One binary in this toolchain is the source of the corpus for RISC-V.
 
-Pour le MC68HC11 il y a un cross-compilateur fourni avec Ubuntu 12.04, par exemple,
-qui fabrique des binaires ELF.
-Le compilateur disponible sur \url{http://sdcc.sourceforge.net/} fabrique des fichiers
-au format HEX, pour plusieurs variantes de 8051 (mcd51, ds390, ds400),
-de Z80 (z80, z180, r2k, r3ka\footnote
-{La compilation avec \texttt{-mtlcs90} n'est pas détectée comme fabriquant du code Z80,
-ce qui est surprenant car (contrairement au TLCS 900) le TLCS 90 est binairement
-compatible avec le Z80.
-Le corpus les considère donc comme deux architectures distinctes.}),
-pour STM8,
-et au format ELF pour des MC68HC08 (hc08, s08).
+For many 8-bit architecture, there is not enough memory to be able to implement zlib or libjpeg.
+Instead of zlib or libjpeg, small arbitrary C programs have been compiled: `tea` (the TEA cipher), `arithmetic` (simple arithmetic operations), `path` (path finding in graphs).
+To have a better corpus, more should have been used.
 
-Pour le 6502, \url{https://github.com/cc65/cc65} permet de fabriquer du code,
-mais celui-ci est trop caractéristique du compilateur, plutôt que du microprocesseur
-(cela se voit en regardant la régularité de l'assembleur engendré,
-et en pratique l'apprentissage sur ce code ne permet par exemple pas de reconnaître des ROM Apple II).
-Le corpus par défaut ne permet donc pas de reconnaître le 6502 mais uniquement une variante
-que je nomme \texttt{\#6502\#cc65}.
+The cross-compiler for MC68HC11 available with Ubuntu 12.04 has been used.
 
-\subsection{En l'absence de cross-compilateur}
-Il n'y a pas de compilateur libre permettant de fabriquer du code PIC\footnote
-{SDCC a des options -mpic16 et -mpic14, mais elles ne sont pas fonctionnelles.},
-Il faut donc trouver des binaires pour les nombreuses variantes de PIC
-(principalement PIC10, PIC16, PIC18, PIC24).
-Le corpus inclut un firmware pour PIC18
-(issu de \url{https://github.com/radare/radare2-regressions/blob/master/bins/pic18c/FreeRTOS-pic18c.hex})
-et un autre pour PIC24
-(issu de \url{https://raw.githubusercontent.com/mikebdp2/Bus_Pirate/master/package_latest/BPv4/firmware/bpv4_fw7.0_opt0_18092016.hex})
-et des petits firmwares pour PIC10 et PIC16
-(issus de \url{http://www.pic24.ru/doku.php/en/osa/ref/examples/intro}).
+The compiler available ar http://sdcc.sourceforge.net/ can build binaries in HEX format, for many variants of 8051 (mcd51, ds390, ds400) and Z80 (z80, z180, r2k, r3ka), for STM8, and also ELF binaries for MC68HC08 (hc08, s08).
+Note that when `-mtlcs90` is used, the result is not detected by `cpu_rec` as being Z80 code, which is surprising because the TLCS 90 is binary compatible with the Z80. Therefore our corpus considers that Z80 and TLCS-90 are different architectures. Note that TLCS 900 is not binary compatible with Z80, but is not known to SDCC.
 
-\subsection{Qualité du corpus obtenu}
-Le corpus d'apprentissage doit être discriminant :
-deux labels différents doivent correspondre à deux comportements statistiques différents.
-Pour satisfaire ce critère, les labels ont été définis progressivement.
-Par exemple, lorsque l'architecture SPARC a été apprise sur des binaires SPARC v7,
-l'outil a été utilisé pour analyser des binaires SPARC v9 (64-bits, et avec un jeu d'instructions
-ayant des extensions) :
-la plupart de ces binaires ont été reconnus comme SPARC, donc la conclusion est que
-ces architectures sont proches ;
-ensuite l'outil a été utilisé sur des binaires SPARC v7 et SPARC v9,
-avec un apprentissage sur un corpus différenciant v7 et v9 :
-les binaires v7 ont été reconnus comme v7 ou v9, et les binaires v9 ont été reconnus comme v7 ou v9,
-donc la conclusion est que l'approche par bigrammes et trigrammes ne discrimine pas entre
-ces deux architectures ;
-le corpus ne contient donc qu'une architecture SPARC.
+For the 6502 architecture, there is a compiler at https://github.com/cc65/cc65, but the code generated from a C source is very regular and unlike any normal 6502 code. Therefore this is a specific architecture named `#6502#cc65`.
 
+## When there is no cross-compiler
+For example, there seem to be no open-source compiler that generates PIC code (SDCC has options `-mpic16` and `-mpic14` but they don't work).
+We needed to find binaries for the many variants of PIC (mainly PIC10, PIC16, PIC18 and PIC24), by looking on the web for binaries with non restrictive distribution licences.
 
-Pour une architecture donnée, le corpus doit être suffisant :
-il faut suffisamment de données pour que le comptage des bigrammes et trigrammes
-fasse émerger des caractéristiques de cette architecture.
-Lorsqu'un corpus pour une architecture est insuffisant,
-l'outil se met à fournir des réponses erronées pour les autres architectures :
-le corpus insuffisant a une distribution trop peu marquée qui perturbe les calculs
-de proximité.
-Une solution (en l'absence de données supplémentaires) est de relire de façon répétée
-les données au moment de l'apprentissage
-(c'est une solution parce que le calcul de la distance de Kullback-Leibler,
-afin d'éviter des divisions par 0, additionne une distribution uniforme à la
-distribution observée dans le corpus ; répéter le corpus revient à diminuer
-le poids de cette distribution uniforme).
+For some other architectures (e.g. 78k and TriCore) the only binaries found cannot be redistributed as part of `cpu_rec` corpus.
 
-\medskip
-L'amélioration du corpus peut se faire dans deux directions :
-\begin{itemize}
-\item
-Extension du corpus pour les architectures pour lesquelles celui-ci est insuffisant.
-Si on calcule la taille (comprimée par xz) de chaque fichier du corpus,
-les plus petits sont ceux pour lesquels le corpus contient le moins d'information.
-On en déduit que les CPUs pour lesquels les données sont le plus incomplètes sont :
-PIC10, STM8, PIC16, PIC18, TMS320C2x, puis Z80, 8051, 68HC08, 68HC11 et TLCS-90.
-\item
-Rajout de nouvelles architectures.
-Voici une liste de quelques architectures qui ne sont pas présentes dans le corpus,
-et pour lesquelles il faudrait vérifier si elles ne sont pas proches d'une architecture connue,
-ou bien les rajouter dans le corpus\footnote
-{Cette liste d'architectures existantes est issue principalement de
-\url{https://en.wikipedia.org/wiki/Microprocessor},
-\url{https://en.wikipedia.org/wiki/List_of_instruction_sets},
-\url{https://en.wikipedia.org/wiki/Comparison_of_instruction_set_architectures},
-\url{https://en.wikipedia.org/wiki/Digital_signal_processor}
-et \url{https://github.com/larsbrinkhoff/awesome-cpus}.} :
-6502, % aka. MCS-6500
-6800 (si différent du PDP-11 et des 68HCx),
-6809, % Motorola, nouveaux opcodes comparé au 6800
-8080 (incl. 8085),
-AM29k, % AMD
-B5000, % Burroughs
-CDC-*, % Cray's first supercomputers
+## About the quality of the corpus
+### How the quality of the current corpus has been evaluated
+It has to be discriminating: two different architectures shall correspond to two different statistical behaviours.
+To satisfy this criterion, each architecture has been precisely studied before being added to the corpus.
+
+For example, SPARC architecture was first trained on SPARC v7 binaries (old 32-bit variant) and then `cpu_rec` has been used on SPARC v9 binaries (64-bit, with extended instruction set). Most of the SPARC v9 binaries have been recognized as SPARC, therefore the first conclusion is that these two architectures are close.
+Then the corpus has been trained on SPARC v9 binaries too. With this new corpus that aimed at make the difference between v7 and v9, `cpu_rec` failed at making the difference: v7 binaries were recognised as v7 or v9, and v9 binaries were recognized as v7 or v9.
+The conclusion is that doing statistics on bigrams and trigrams is not sufficient to differentiate v7 and v9, and therefore `cpu_rec` has only one SPARC architecture, trained on both v7 and v9.
+Another tool is needed to make the difference.
+
+For a given architecture, the training data has to be large enough, such that counting bigrams and trigrams is sufficient to derive a signature specific of this architecture.
+When adding to the corpus an architecture with a training data that is too small, then `cpu_rec` starts to output erroneous answers for other architectures. Sometimes, this adverse effect is avoided by repeating the training data (option `repeat` in `add_training`) because of the way the Kullback-Leibler is computed. Sometimes the training data is really too small and the architecture cannot be added.
+
+### How to improve the quality of the corpus.
+A first improvement is to have better training data for some existing architectures.
+One way to know which architecture need to be improved is to look at the size of the xz-compressed corpus, because the smallest are the ones that contain the less information.
+The priority order is: PIC10, 6502, CUDA, STM8, PIC16, PIC18, TMS320C2x, then Z80, WASM, 68HC08, TLCS-90, 68HC11 and 8051.
+
+The other improvement is by adding new architectures.
+Some examples of missing architectures, taken from various lists (https://en.wikipedia.org/wiki/Microprocessor, https://en.wikipedia.org/wiki/List_of_instruction_sets, https://en.wikipedia.org/wiki/Comparison_of_instruction_set_architectures, https://en.wikipedia.org/wiki/Digital_signal_processor, and https://github.com/larsbrinkhoff/awesome-cpus) are:
+6800 (if different of PDP-11 and 68HCx),
+6809 (if the new opcodes make it a different architecture from 6800),
+8080 (including 8085),
+AM29k (from AMD),
+B5000 (from Burroughs),
+CDC-* (Cray's first supercomputers),
 CEVA-XC, CEVA-X, CEVA-Teaklite,
-DSP56k, % Motorola
+DSP56k (from Motorola),
 Elbrus VLIW,
 eSi-RISC,
-F8, % Fairchild
-F18A, % GreenArrays
-HD6301, % Hitachi
-KDF9, % English Electric
+F8 (from Fairchild),
+F18A (from GreenArrays),
+HD6301 (from Hitachi),
+KDF9 (from English Electric),
 i960,
-MARC4, % Eurosil/Temic/Atmel
-MCS-48, % Intel
+MARC4 (from Eurosil/Temic/Atmel),
+MCS-48 (from Intel),
 Mico8,
-MSC81xx, % Freescale
+MSC81xx (from Freescale),
 OpenRISC,
 PDP-1, PDP-7, PDP-8, PDP-10,
 %PIC10 (incl. PIC12), PIC16,
-PSC1000, % aka. Ignite, aka. ShBoom
-Propeller, % Parallax P8X32A
-RTX2000, % Harris
-S1C6x, % Epson
-Saturn, % HP scientific calculators
-SHARC, % e.g. Analog Devices
+PSC1000 (aka. Ignite, aka. ShBoom),
+Propeller (aka. Parallax P8X32A)
+RTX2000 (from Harris),
+S1C6x (from Epson),
+Saturn (from HP scientific calculators),
+SHARC (from Analog Devices)
 Signetics 2650,
-SPC, % Sunplus S+Core 
-SystemZ (si différent du S/390),
+SPC (Sunplus S+Core )
+SystemZ (if different from S/390),
 TMS320C1x, TMS320C3x, TMS320C5x,
-Transputer, % Inmos
-TriMedia, % NXP
-xCore. % XMOS
-\end{itemize}
+Transputer (from Inmos),
+xCore (from XMOS).
