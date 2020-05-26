@@ -65,7 +65,7 @@
 
 
 
-import sys, struct, re
+import sys, struct, os
 from time import time
 import logging
 log = logging.getLogger("cpu_rec")
@@ -263,7 +263,6 @@ class TrainingData(object):
         return data
     def read_corpus(self):
         """ Gets the raw training dataset """
-        import os
         basedir = os.path.dirname(__file__)
         if basedir != '': basedir += '/'
         # If the default training set has been installed along cpu_rec.py,
@@ -447,7 +446,7 @@ class TrainingData(object):
         # PIC18 from https://github.com/radare/radare2-regressions/blob/master/bins/pic18c/FreeRTOS-pic18c.hex
         self.add_training('PIC18',         file = basedir+'PIC18/FreeRTOS-pic18c.hex', repeat=5)
         # PIC24 from https://raw.githubusercontent.com/mikebdp2/Bus_Pirate/master/package_latest/BPv4/firmware/bpv4_fw7.0_opt0_18092016.hex
-        self.add_training('PIC24',         file = basedir+'PIC24/bpv4_fw7.0_opt0_18092016.hex', slice=(0x8830,0x1d2e0))
+        self.add_training('PIC24',         file = basedir+'PIC24/bpv4_fw7.0_opt0_18092016.hex', section=slice(0x8830,0x1d2e0))
         # 6502 binary compiled with https://github.com/cc65/cc65
         # This appears to be more compiler-dependent than CPU-dependent, the
         # statistics are very different from an AppleII ROM, for example.
@@ -553,8 +552,8 @@ class MarkovCrossEntropy(object):
         self.counts = {}
         self.Q = {}
         self.base_freq = {}
-        for idx, data in enumerate(training.data):
-            arch = training.archs[idx]
+        for i, data in enumerate(training.data):
+            arch = training.archs[i]
             if not arch in self.counts:
                 self.counts[arch] = {}
             self.count(data, self.counts[arch], base_count)
@@ -563,7 +562,7 @@ class MarkovCrossEntropy(object):
                 len(self.counts[arch]),
                 ['','','bigrams','trigrams','quadrigrams'][length],
                 arch,
-                training.files[idx])
+                training.files[i])
             # replace counts by frequencies
             Qtotal = base_count * (self.tbl_size-len(self.counts[arch]))
             for v in self.counts[arch].values():
@@ -745,7 +744,6 @@ if __name__ == "__main__":
         dump = True
         assert len(argv) == 2
         dumpdir = argv[1]
-        import os
         if not os.path.isdir(dumpdir):
             log.error("Directory %r should be created before running the tool", dumpdir)
             sys.exit(1)

@@ -288,3 +288,7 @@ and was distributed for the Atredis BlackHat 2018 challenge, under an unknown li
 ## Other architectures that cannot be distributed in the default corpus
 - A binary for Nec/Renesas 78k can be found at https://www.metz-mecatech.de/en/lighting/firmware-download-flash-units/mecablitz-50-af-1-digital.html where it is distributed under a restrictive licence. The file named `MB50AF1_NikonV12.mtz` is a nibble-swapped Intel-HEX firmware (cf. https://debugmo.de/2011/10/whats-inside-metz-50-af-1-n/) with 0x7d5a bytes of 78k code starting at offset 0x2ba.
 - An example of binary for TriCore is the firmware of the ECU of Volkswagen cars. This firmware is distributed under a restrictive licence not allowing redistribution, at https://erwin.volkswagen.de/erwin/showHome.do where it can be downloaded at no cost after the creation of a free account.
+
+## Development status
+
+[![Code Quality](https://img.shields.io/lgtm/grade/python/g/airbus-seclab/cpu_rec.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/airbus-seclab/cpu_rec/context:python)
