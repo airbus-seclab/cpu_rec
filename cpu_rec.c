@@ -93,11 +93,12 @@ struct stats *read_corpus()
     char filename[100];
     struct dirent *f = readdir(d);
     if (f==NULL) break;
-    if ((f->d_namlen<7) || strcmp(f->d_name+f->d_namlen-7,".corpus")) continue;
+    uint8_t d_namlen = strlen(f->d_name);
+    if ((d_namlen<7) || strcmp(f->d_name+d_namlen-7,".corpus")) continue;
     snprintf(filename, 100, BASEDIR "/%s", f->d_name);
     if (verbose) printf("* %s\n", filename);
     s[h] = count_ngrams(filename);
-    s[h].arch = strndup(f->d_name,f->d_namlen-7);
+    s[h].arch = strndup(f->d_name,d_namlen-7);
     /*
     for (i=0; i<M2C; i++)
       if (s[h].m2[i])
