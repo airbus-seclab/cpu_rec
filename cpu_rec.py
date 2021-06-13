@@ -531,7 +531,7 @@ class MarkovCrossEntropy(object):
         self.tbl_size = 0x100**length
         if   length == 2 and modulo is None:
             self.count = self.count_bigrams
-        elif length == 2 and modulo is 4:
+        elif length == 2 and modulo == 4:
             self.count = self.count_bigrams_mod4
         elif length == 3:
             self.count = self.count_trigrams
