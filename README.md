@@ -164,7 +164,7 @@ a [translation in English of the paper](doc/cpu_rec_sstic_english.md) is in prog
 [`68HC11`](https://en.wikipedia.org/wiki/Freescale_68HC11)
 [`8051`](https://en.wikipedia.org/wiki/Intel_MCS-51)
 [`Alpha`](https://en.wikipedia.org/wiki/DEC_Alpha)
-[`ARcompact`](https://en.wikipedia.org/wiki/ARC_(processor))
+[`ARC32eb` `ARC32el` `ARcompact`](https://en.wikipedia.org/wiki/ARC_(processor))
 [`ARM64` `ARMeb` `ARMel` `ARMhf`](https://en.wikipedia.org/wiki/ARM_architecture)
 [`AVR`](https://en.wikipedia.org/wiki/Atmel_AVR)
 [`AxisCris`](https://en.wikipedia.org/wiki/ETRAX_CRIS)
@@ -283,6 +283,7 @@ and was distributed for the Atredis BlackHat 2018 challenge, under an unknown li
 - The binary for TriMedia comes from https://github.com/crackinglandia/trimedia/blob/master/tm-linux/tmlinux-kernel-obj-latest.tar.bz2 where it is distributed under an unknown licence.
 - The binary for CUDA comes from http://jcuda.org/samples/matrixInvert%200.0.1%20CUBIN%2032bit.zip where it is distributed under a MIT licence.
 - The binary for WebAssembly comes from https://github.com/mdn/webassembly-examples/blob/master/wasm-sobel/change.wasm where it is distributed under a CC Zero licence.
+- The binaries for ARC32eb and ARC32el come from https://www.maintech.de/fileadmin/Downloads/arc-toolchain-20100305-x86.tbz2 where it is distributed under GPLv2 (or later).
 - The reference for statistics of ASCII text comes from https://users.cs.duke.edu/~ola/ap/linuxwords with all LF replaced with NULL bytes.
 
 ## Other architectures that cannot be distributed in the default corpus
