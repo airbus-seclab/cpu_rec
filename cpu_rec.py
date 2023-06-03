@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # Tested with python >= 2.4
 
 # cpu_rec.py is a tool that recognizes cpu instructions
@@ -63,9 +63,12 @@
 #   and calling which_arch with no argument does this precomputation only.
 
 
-import sys, struct, os
+import sys
+import struct
+import os
 from time import time
 import logging
+import argparse
 
 log = logging.getLogger("cpu_rec")
 if not len(log.handlers):
@@ -75,13 +78,6 @@ if not len(log.handlers):
     console_handler.setFormatter(logging.Formatter("%(levelname)-5s: %(message)s"))
     log.addHandler(console_handler)
     log.setLevel(logging.WARN)
-
-# NB: we get a string in python2 and bytes in python3
-if sys.version_info[0] == 2:
-    byte_ord = lambda i: ord(i)
-else:
-    byte_ord = lambda i: i
-
 
 class TrainingData(object):
     def __init__(self):
@@ -632,7 +628,7 @@ class MarkovCrossEntropy(object):
         for idx in range(len(data)):
             v = (data[idx] + 0x100 * v) % self.tbl_size
             if idx >= self.length - 1:
-                if not v in freq:
+                if v not in freq:
                     freq[v] = base_count
                 freq[v] += 1
 
@@ -640,7 +636,7 @@ class MarkovCrossEntropy(object):
         # Each four bytes
         for idx in range(len(data) // 4):
             v = data[4 * idx + 1] + 0x100 * data[4 * idx]
-            if not v in freq:
+            if v not in freq:
                 freq[v] = base_count
             freq[v] += 1
 
@@ -648,10 +644,9 @@ class MarkovCrossEntropy(object):
         # Faster than count_generic
         prv = None
         for c in data:
-            c = byte_ord(c)
             if prv is not None:
                 v = c + 0x100 * prv
-                if not v in freq:
+                if v not in freq:
                     freq[v] = base_count
                 freq[v] += 1
             prv = c
@@ -660,10 +655,9 @@ class MarkovCrossEntropy(object):
         prv = None
         pprv = None
         for c in data:
-            c = byte_ord(c)
             if pprv is not None:
                 v = c + 0x100 * prv + 0x10000 * pprv
-                if not v in freq:
+                if v not in freq:
                     freq[v] = base_count
                 freq[v] += 1
             pprv = prv
@@ -674,10 +668,9 @@ class MarkovCrossEntropy(object):
         pprv = None
         ppprv = None
         for c in data:
-            c = byte_ord(c)
             if ppprv is not None:
                 v = c + 0x100 * prv + 0x10000 * pprv + 0x1000000 * ppprv
-                if not v in freq:
+                if v not in freq:
                     freq[v] = base_count
                 freq[v] += 1
             ppprv = pprv
@@ -714,7 +707,7 @@ class MarkovCrossEntropy(object):
         self.base_freq = {}
         for i, data in enumerate(training.data):
             arch = training.archs[i]
-            if not arch in self.counts:
+            if arch not in self.counts:
                 self.counts[arch] = {}
             self.count(data, self.counts[arch], base_count)
             log.debug(
@@ -825,8 +818,8 @@ class FileAnalysis(object):
             # therefore every four byte is 0x00.
             zero = [True, True, True, True]
             for idx in range(len(d) // 4):
-                zero = [zero[i] and byte_ord(d[4 * idx + i]) == 0 for i in range(4)]
-                if not True in zero:
+                zero = [zero[i] and d[4 * idx + i] == 0 for i in range(4)]
+                if True not in zero:
                     return None
         return res
 
@@ -919,7 +912,7 @@ class FileAnalysis(object):
 
 
 def which_arch(d=None, training={}):
-    if not 'p' in training:
+    if 'p' not in training:
         t = TrainingData()
         t.read_corpus()
         training['p'] = FileAnalysis(t)
@@ -930,32 +923,27 @@ def which_arch(d=None, training={}):
 
 
 if __name__ == "__main__":
-    fast, dump = False, False
-    argv = sys.argv[1:]
-    if len(argv) and argv[0] == '-d':
-        dump = True
-        assert len(argv) == 2
-        dumpdir = argv[1]
-        if not os.path.isdir(dumpdir):
-            log.error("Directory %r should be created before running the tool", dumpdir)
-            sys.exit(1)
-    if len(argv) and argv[0] == '-f':
-        fast = True
-        argv = argv[1:]
-    if len(argv) and argv[0] == '-v':
+    parser = argparse.ArgumentParser(prog='cpu_rec', description='Recognizes the CPU arch of a binary')
+    parser.add_argument('filenames', nargs="+")
+    parser.add_argument('--dump', metavar="dumpdir")
+    parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('-f', '--fast', action='store_true')
+    parser.add_argument('--debug', action='store_true')
+
+    args = parser.parse_args()
+    if args.verbose:
         log.setLevel(logging.INFO)
-        argv = argv[1:]
-        if len(argv) and argv[0] == '-v':
-            log.setLevel(logging.DEBUG)
-            argv = argv[1:]
+    if args.debug:
+        log.setLevel(logging.DEBUG)
+
     t = TrainingData()
     t.read_corpus()
     p = FileAnalysis(t)
-    if dump:
-        t.dump(dumpdir=dumpdir)
-        p.dump(dumpdir=dumpdir)
+    if args.dump:
+        t.dump(args.dumpdir)
+        p.dump(args.dumpdir)
         sys.exit(0)
-    for f in argv:
+    for f in args.filenames:
         sys.stdout.write('%-80s' % f)
         sys.stdout.flush()
         # Full file
@@ -977,7 +965,7 @@ if __name__ == "__main__":
         log.debug("TEXT")
         log.debug("                   %s", r2[:4])
         log.debug("                   %s", r3[:4])
-        if not fast:
+        if not args.fast:
             _, cpu, sz, cnt, _ = p.sliding_window(d)
             sys.stdout.write('%-20s%-10s' % ('chunk(%#x;%s)' % (2 * sz * cnt, cnt), cpu))
         sys.stdout.write('\n')
@@ -1042,7 +1030,7 @@ try:
             length = len(data)
             seen = dict(((x, 0) for x in range(0, 256)))
             for byte in data:
-                seen[byte_ord(byte)] += 1
+                seen[byte] += 1
             for x in range(0, 256):
                 p_x = float(seen[x]) / length
                 if p_x > 0:
