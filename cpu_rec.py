@@ -243,56 +243,23 @@ class TrainingData(object):
         return data
 
     @staticmethod
-    def extract_section(data, section=False):
+    def extract_section(data, section=None):
         # Extract text sections from know containers
         # elfesteem has to be installed
         try:
-            import elfesteem
+            import lief
         except ImportError:
+            log.warning("Could not load lief")
             return data
-        magic = (0x7F, 0x45, 0x4C, 0x46)
-        if data.startswith(struct.pack("%dB" % len(magic), *magic)):
-            from elfesteem import elf_init
-
-            e = elf_init.ELF(data)
-            res = struct.pack("")
-            for sh in e.sh:
-                if (section == 'text' and sh.sh.name.startswith('.text')) or sh.sh.name == section:
-                    res += data[sh.sh.offset : sh.sh.offset + sh.sh.size]
-            if len(res):
-                return res
-        magic = (0x4D, 0x5A)
-        if data.startswith(struct.pack("%dB" % len(magic), *magic)):
-            if section == 'text':
-                section = '.text'
-            from elfesteem import pe_init
-
-            e = pe_init.PE(data)
-            for sh in e.SHList:
-                if sh.name.strip('\0') == section:
-                    return data[sh.offset : sh.offset + sh.rawsize]
-        magic = ((0xCE, 0xFA, 0xED, 0xFE), (0xCF, 0xFA, 0xED, 0xFE))
-        if data.startswith(tuple([struct.pack("4B", *_) for _ in magic])):
-            if section == 'text':
-                section = '__TEXT'
-            from elfesteem import macho_init
-
-            e = macho_init.MACHO(data, parseSymbols=False)
-            for s in e.sect.sect:
-                if s.sh.segname == section:
-                    return data[s.sh.offset : s.sh.offset + s.sh.size]
-        try:
-            from elfesteem import pe_init, pe
-
-            e = pe_init.Coff(data)
-            if section == 'text':
-                section = '.text'
-            for sh in e.SHList:
-                if sh.name.strip('\0') == section:
-                    return data[sh.offset : sh.offset + sh.rawsize]
-        except ValueError:
-            pass
-        return data
+        l = lief.parse(data)
+        if not l:
+            return data
+        res = b""
+        section_names = [section] if section else [".text", "__TEXT"]
+        for s in l.sections:
+            if s.name in section_names:
+                res += s.content
+        return res
 
     def read_corpus(self):
         """Gets the raw training dataset"""
