@@ -129,10 +129,7 @@ class TrainingData(object):
     @staticmethod
     def unpack_ihex(data):
         # https://en.wikipedia.org/wiki/Intel_HEX
-        if sys.version_info[0] == 3:
-            lines = data.decode('latin1').split('\n')
-        else:
-            lines = data.split('\n')
+        lines = data.decode('latin1').split('\n')
         sorted_lines = []
         base_address = 0
         for line in lines:
@@ -200,10 +197,7 @@ class TrainingData(object):
         # ftp://kermit.columbia.edu/kermit/bin/cklxtr.cm
         # The decoding below is not fully valid, but sufficient for
         # our statistical analysis
-        if sys.version_info[0] == 3:
-            lines = data.decode('latin1').split('\n')
-        else:
-            lines = data.split('\n')
+        lines = data.decode('latin1').split('\n')
         res = []
         for line in lines:
             if line.endswith('\r'):
@@ -973,32 +967,28 @@ if __name__ == "__main__":
             log.warning("Could not save cached training data")
 
     for f in args.filenames:
-        sys.stdout.write('%-80s' % f)
-        sys.stdout.flush()
+        print('%-80s' % f, end='')
         # Full file
         d = TrainingData.unpack_file(open(f, 'rb').read())
         res, r2, r3 = p.deduce(d)
-        sys.stdout.write('%-15s%-10s' % ('full(%#x)' % len(d), res))
-        sys.stdout.flush()
+        print('%-15s%-10s' % ('full(%#x)' % len(d), res), end='')
         log.debug("FULL")
         log.debug("                   %s", r2[:4])
         log.debug("                   %s", r3[:4])
         # Text section, if possible
-        d_txt = TrainingData.extract_section(d, section='text')
-        if len(d) != len(d_txt):
+        d_txt = TrainingData.extract_section(d)
+        if d_txt:
             res, r2, r3 = p.deduce(d_txt)
-            sys.stdout.write('%-15s%-10s' % ('text(%#x)' % len(d_txt), res))
+            print('%-15s%-10s' % ('text(%#x)' % len(d_txt), res), end='')
         else:
-            sys.stdout.write('%-15s%-10s' % ('', ''))
-        sys.stdout.flush()
+            print('%-15s%-10s' % ('', ''), end='')
         log.debug("TEXT")
         log.debug("                   %s", r2[:4])
         log.debug("                   %s", r3[:4])
         if not args.fast:
             _, cpu, sz, cnt, _ = p.sliding_window(d)
-            sys.stdout.write('%-20s%-10s' % ('chunk(%#x;%s)' % (2 * sz * cnt, cnt), cpu))
-        sys.stdout.write('\n')
-        sys.stdout.flush()
+            print('%-20s%-10s' % ('chunk(%#x;%s)' % (2 * sz * cnt, cnt), cpu), end='')
+        print('')
     sys.exit(0)
 
 #######################################################
