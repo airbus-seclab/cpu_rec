@@ -66,6 +66,7 @@
 import sys
 import struct
 import os
+import pickle
 from time import time
 import logging
 import argparse
@@ -779,6 +780,9 @@ class MarkovCrossEntropy(object):
             res += fmt % (idx, v)
         return res
 
+    def delcounts(self):
+        del self.counts
+
 
 class FileAnalysis(object):
     def dump(self, dumpdir=None):
@@ -794,6 +798,11 @@ class FileAnalysis(object):
         self.archs = set(t.archs)
         self.m2 = MarkovCrossEntropy(t)
         self.m3 = MarkovCrossEntropy(t, length=3)
+
+    # Cleanup unused data
+    def delcounts(self):
+        self.m2.delcounts()
+        self.m3.delcounts()
 
     def heuristic(self, r2, r3, d):
         # The following heuristics should probably be replaced by the result of
@@ -925,7 +934,7 @@ def which_arch(d=None, training={}):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='cpu_rec', description='Recognizes the CPU arch of a binary')
     parser.add_argument('filenames', nargs="+")
-    parser.add_argument('--dump', metavar="dumpdir")
+    parser.add_argument('--dump', dest="dumpdir")
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-f', '--fast', action='store_true')
     parser.add_argument('--debug', action='store_true')
@@ -936,13 +945,33 @@ if __name__ == "__main__":
     if args.debug:
         log.setLevel(logging.DEBUG)
 
-    t = TrainingData()
-    t.read_corpus()
-    p = FileAnalysis(t)
-    if args.dump:
+    # Always recompute data for dump
+    if args.dumpdir:
+        os.makedirs(args.dumpdir, exist_ok=True)
+        t = TrainingData()
+        t.read_corpus()
+        p = FileAnalysis(t)
         t.dump(args.dumpdir)
         p.dump(args.dumpdir)
         sys.exit(0)
+
+    pickled_data = os.path.join(os.path.dirname(__file__), "stats.pick")
+    if os.path.isfile(pickled_data):
+        log.info("Loading training data from pickled file")
+        t, p = pickle.load(open(pickled_data, "rb"))
+    else:
+        log.info("Pickled training data not found, loading from corpus")
+        t = TrainingData()
+        t.read_corpus()
+        p = FileAnalysis(t)
+        log.info("Saving pickled training data")
+        p.delcounts()
+        try:
+            with open(pickled_data, "wb") as f:
+                pickle.dump((t, p), f)
+        except OSError:
+            log.warning("Could not save cached training data")
+
     for f in args.filenames:
         sys.stdout.write('%-80s' % f)
         sys.stdout.flush()
