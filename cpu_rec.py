@@ -263,12 +263,10 @@ class TrainingData(object):
 
     def read_corpus(self):
         """Gets the raw training dataset"""
-        basedir = os.path.dirname(__file__)
-        if basedir != '':
-            basedir += '/'
+        basedir = os.path.dirname(os.path.realpath(__file__))
         # If the default training set has been installed along cpu_rec.py,
         # we use it.
-        default_corpus = basedir + 'cpu_rec_corpus'
+        default_corpus = os.path.join(basedir, 'cpu_rec_corpus')
         if os.access(default_corpus, os.R_OK):
             files = os.listdir(default_corpus)
             for file in files:
@@ -291,7 +289,7 @@ class TrainingData(object):
             return
         # If we have access to the binary files used to construct the
         # default corpus, we use them.
-        source_corpus = basedir + 'cpu_rec_source_corpus/'
+        source_corpus = os.path.join(basedir, 'cpu_rec_source_corpus')
         if os.access(source_corpus, os.R_OK):
             self.build_default_corpus(source_corpus)
             return
@@ -310,263 +308,263 @@ class TrainingData(object):
             ('_mask1', struct.pack("16B", *[0xFF, 0xFF, 0xFF, 0x00] * 4) * 32 * 1024),
         ):
             self.add_training(key, data=pattern)
-        self.add_training('_words', file=basedir + 'words')
-        self.add_training('_words_ucs2', file=basedir + 'words_ucs2')
+        self.add_training('_words', file=os.path.join(basedir, 'words'))
+        self.add_training('_words_ucs2', file=os.path.join(basedir, 'words_ucs2'))
         # A few selected files from Trou's corpus for REDOCS, or cross-compiled
         # as explained in the paper for SSTIC'2017.
-        self.add_training('X86', file=basedir + 'ELF/i386/libgmp.so.10.2.0.xz')
-        self.add_training('X86-64', file=basedir + 'ELF/amd64/libgmp.so.10.2.0.xz')
-        self.add_training('ARMeb', file=basedir + '__TODO/busybox.net/busybox-armv4eb')
-        self.add_training('ARMel', file=basedir + 'ELF/armel/libgmp.so.10.2.0.xz')
-        self.add_training('ARM64', file=basedir + 'ELF/arm64/libgmp.so.10.2.0.xz')  # el
-        self.add_training('ARMhf', file=basedir + 'ELF/armhf/libgmp.so.10.2.0.xz')  # el
-        self.add_training('M68k', file=basedir + 'ELF/m68k/libc-2.3.2.so.xz')
+        self.add_training('X86', file=os.path.join(basedir, 'ELF/i386/libgmp.so.10.2.0.xz'))
+        self.add_training('X86-64', file=os.path.join(basedir, 'ELF/amd64/libgmp.so.10.2.0.xz'))
+        self.add_training('ARMeb', file=os.path.join(basedir, '__TODO/busybox.net/busybox-armv4eb'))
+        self.add_training('ARMel', file=os.path.join(basedir, 'ELF/armel/libgmp.so.10.2.0.xz'))
+        self.add_training('ARM64', file=os.path.join(basedir, 'ELF/arm64/libgmp.so.10.2.0.xz'))  # el
+        self.add_training('ARMhf', file=os.path.join(basedir, 'ELF/armhf/libgmp.so.10.2.0.xz'))  # el
+        self.add_training('M68k', file=os.path.join(basedir, 'ELF/m68k/libc-2.3.2.so.xz'))
         self.add_training(
-            'PPCeb', file=basedir + 'ELF/powerpc/libgmp.so.10.2.0.xz'
+            'PPCeb', file=os.path.join(basedir, 'ELF/powerpc/libgmp.so.10.2.0.xz')
         )  # Big Endian (32 or 64-bit)
         self.add_training(
-            'PPCel', file=basedir + 'ELF/ppc64el/libgmp.so.10.2.0.xz'
+            'PPCel', file=os.path.join(basedir, 'ELF/ppc64el/libgmp.so.10.2.0.xz')
         )  # Little Endian (32 or 64-bit)
-        self.add_training('S-390', file=basedir + 'ELF/s390x/libgmp.so.10.2.0.xz')  # S/390
-        self.add_training('SPARC', file=basedir + 'ELF/sparc/libc-2.1.3.so.xz')
-        self.add_training('SPARC', file=basedir + 'ELF/sparc64/libm-2.7.so.xz')
-        self.add_training('Alpha', file=basedir + 'ELF/alpha/libc-2.7.so.xz')
-        self.add_training('HP-PA', file=basedir + 'ELF/hppa/libc-2.3.2.so.xz')
-        self.add_training('RISC-V', file=basedir + '__TODO/elf/guess-number-riscv64')
-        self.add_training('ARcompact', file=basedir + 'CROSS_COMPILED/minigzip-arc-elf.xz')
-        self.add_training('ARcompact', file=basedir + 'CROSS_COMPILED/jpegtran-arc-elf.xz')
-        self.add_training('AVR', file=basedir + 'CROSS_COMPILED/minigzip-avr-elf.xz')
-        self.add_training('AVR', file=basedir + 'CROSS_COMPILED/jpegtran-avr-elf.xz')
-        self.add_training('Blackfin', file=basedir + 'CROSS_COMPILED/minigzip-bfin-elf.xz')
-        self.add_training('Blackfin', file=basedir + 'CROSS_COMPILED/jpegtran-bfin-elf.xz')
-        self.add_training('TMS320C2x', file=basedir + 'TMS320/C28346_Load_Program_to_Flash.out', repeat=5)
-        self.add_training('TMS320C6x', file=basedir + 'CROSS_COMPILED/minigzip-c6x-elf.xz')
+        self.add_training('S-390', file=os.path.join(basedir, 'ELF/s390x/libgmp.so.10.2.0.xz'))  # S/390
+        self.add_training('SPARC', file=os.path.join(basedir, 'ELF/sparc/libc-2.1.3.so.xz'))
+        self.add_training('SPARC', file=os.path.join(basedir, 'ELF/sparc64/libm-2.7.so.xz'))
+        self.add_training('Alpha', file=os.path.join(basedir, 'ELF/alpha/libc-2.7.so.xz'))
+        self.add_training('HP-PA', file=os.path.join(basedir, 'ELF/hppa/libc-2.3.2.so.xz'))
+        self.add_training('RISC-V', file=os.path.join(basedir, '__TODO/elf/guess-number-riscv64'))
+        self.add_training('ARcompact', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-arc-elf.xz'))
+        self.add_training('ARcompact', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-arc-elf.xz'))
+        self.add_training('AVR', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-avr-elf.xz'))
+        self.add_training('AVR', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-avr-elf.xz'))
+        self.add_training('Blackfin', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-bfin-elf.xz'))
+        self.add_training('Blackfin', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-bfin-elf.xz'))
+        self.add_training('TMS320C2x', file=os.path.join(basedir, 'TMS320/C28346_Load_Program_to_Flash.out'), repeat=5)
+        self.add_training('TMS320C6x', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-c6x-elf.xz'))
         #       _training('TMS320C6x',     file = basedir+'CROSS_COMPILED/jpegtran-c6x-elf.xz') # does not build; bug of gcc for jccolor.o
-        self.add_training('CompactRISC', file=basedir + 'CROSS_COMPILED/minigzip-cr16-elf.xz')
+        self.add_training('CompactRISC', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-cr16-elf.xz'))
         #       _training('CompactRISC',   file = basedir+'CROSS_COMPILED/jpegtran-cr16-elf.xz') # does not build; bug of gcc for jdmarker.o
-        self.add_training('AxisCris', file=basedir + 'CROSS_COMPILED/minigzip-cris-elf.xz')
-        self.add_training('AxisCris', file=basedir + 'CROSS_COMPILED/jpegtran-cris-elf.xz')
-        self.add_training('Epiphany', file=basedir + 'CROSS_COMPILED/minigzip-epiphany-elf.xz')
+        self.add_training('AxisCris', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-cris-elf.xz'))
+        self.add_training('AxisCris', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-cris-elf.xz'))
+        self.add_training('Epiphany', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-epiphany-elf.xz'))
         #       _training('Epiphany',      file = basedir+'CROSS_COMPILED/jpegtran-epiphany-elf.xz') # does not build; bug of gcc for jidctred.o
-        self.add_training('FR30', file=basedir + 'CROSS_COMPILED/minigzip-fr30-elf.xz')  # Fujitsu FR30
-        self.add_training('FR30', file=basedir + 'CROSS_COMPILED/jpegtran-fr30-elf.xz')
-        self.add_training('FR-V', file=basedir + 'CROSS_COMPILED/minigzip-frv-elf.xz')
-        self.add_training('FR-V', file=basedir + 'CROSS_COMPILED/jpegtran-frv-elf.xz')
-        self.add_training('FT32', file=basedir + 'CROSS_COMPILED/minigzip-ft32-elf.xz')  # FTDI FT32
-        self.add_training('FT32', file=basedir + 'CROSS_COMPILED/jpegtran-ft32-elf.xz')
-        self.add_training('H8-300', file=basedir + 'CROSS_COMPILED/minigzip-h8300-elf.xz')  # H8/300
-        self.add_training('H8-300', file=basedir + 'CROSS_COMPILED/jpegtran-h8300-elf.xz')  # H8/300
-        self.add_training('IA-64', file=basedir + 'CROSS_COMPILED/minigzip-ia64-elf.xz')
-        self.add_training('IA-64', file=basedir + 'CROSS_COMPILED/jpegtran-ia64-elf.xz')
-        self.add_training('IQ2000', file=basedir + 'CROSS_COMPILED/minigzip-iq2000-elf.xz')  # Vitesse IQ2000
-        self.add_training('IQ2000', file=basedir + 'CROSS_COMPILED/jpegtran-iq2000-elf.xz')
-        self.add_training('Mico32', file=basedir + 'CROSS_COMPILED/minigzip-lm32-elf.xz')  # LatticeMico32
-        self.add_training('Mico32', file=basedir + 'CROSS_COMPILED/jpegtran-lm32-elf.xz')
-        self.add_training('M32C', file=basedir + 'CROSS_COMPILED/minigzip-m32c-elf.xz')
-        self.add_training('M32C', file=basedir + 'CROSS_COMPILED/jpegtran-m32c-elf.xz')
-        self.add_training('M32R', file=basedir + 'CROSS_COMPILED/minigzip-m32r-elf.xz')
-        self.add_training('M32R', file=basedir + 'CROSS_COMPILED/jpegtran-m32r-elf.xz')
-        self.add_training('MCore', file=basedir + 'CROSS_COMPILED/minigzip-mcore-elf.xz')  # aka. Motorola RCE
-        self.add_training('MCore', file=basedir + 'CROSS_COMPILED/jpegtran-mcore-elf.xz')
-        self.add_training('MicroBlaze', file=basedir + 'CROSS_COMPILED/minigzip-microblaze-elf.xz')
-        self.add_training('MicroBlaze', file=basedir + 'CROSS_COMPILED/jpegtran-microblaze-elf.xz')
-        self.add_training('MIPSel', file=basedir + 'ELF/mipsel/libgmp.so.10.2.0.xz')
-        self.add_training('MIPSeb', file=basedir + 'ELF/mips/libgmp.so.10.2.0.xz')
-        self.add_training('MIPSeb', file=basedir + 'CROSS_COMPILED/minigzip-mips1-elf.xz')
-        self.add_training('MIPSeb', file=basedir + 'CROSS_COMPILED/jpegtran-mips1-elf.xz')
-        self.add_training('MIPSeb', file=basedir + 'CROSS_COMPILED/minigzip-mips2-elf.xz')
-        self.add_training('MIPSeb', file=basedir + 'CROSS_COMPILED/jpegtran-mips2-elf.xz')
-        self.add_training('MIPS16', file=basedir + 'CROSS_COMPILED/minigzip-mips16-elf.xz')
-        self.add_training('MIPS16', file=basedir + 'CROSS_COMPILED/jpegtran-mips16-elf.xz')
-        self.add_training('MMIX', file=basedir + 'CROSS_COMPILED/minigzip-mmix-elf.xz', repeat=2)
-        self.add_training('MMIX', file=basedir + 'CROSS_COMPILED/jpegtran-mmix-elf.xz', repeat=2)
+        self.add_training('FR30', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-fr30-elf.xz'))  # Fujitsu FR30
+        self.add_training('FR30', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-fr30-elf.xz'))
+        self.add_training('FR-V', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-frv-elf.xz'))
+        self.add_training('FR-V', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-frv-elf.xz'))
+        self.add_training('FT32', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-ft32-elf.xz'))  # FTDI FT32
+        self.add_training('FT32', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-ft32-elf.xz'))
+        self.add_training('H8-300', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-h8300-elf.xz'))  # H8/300
+        self.add_training('H8-300', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-h8300-elf.xz'))  # H8/300
+        self.add_training('IA-64', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-ia64-elf.xz'))
+        self.add_training('IA-64', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-ia64-elf.xz'))
+        self.add_training('IQ2000', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-iq2000-elf.xz'))  # Vitesse IQ2000
+        self.add_training('IQ2000', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-iq2000-elf.xz'))
+        self.add_training('Mico32', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-lm32-elf.xz'))  # LatticeMico32
+        self.add_training('Mico32', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-lm32-elf.xz'))
+        self.add_training('M32C', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-m32c-elf.xz'))
+        self.add_training('M32C', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-m32c-elf.xz'))
+        self.add_training('M32R', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-m32r-elf.xz'))
+        self.add_training('M32R', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-m32r-elf.xz'))
+        self.add_training('MCore', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-mcore-elf.xz'))  # aka. Motorola RCE
+        self.add_training('MCore', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-mcore-elf.xz'))
+        self.add_training('MicroBlaze', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-microblaze-elf.xz'))
+        self.add_training('MicroBlaze', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-microblaze-elf.xz'))
+        self.add_training('MIPSel', file=os.path.join(basedir, 'ELF/mipsel/libgmp.so.10.2.0.xz'))
+        self.add_training('MIPSeb', file=os.path.join(basedir, 'ELF/mips/libgmp.so.10.2.0.xz'))
+        self.add_training('MIPSeb', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-mips1-elf.xz'))
+        self.add_training('MIPSeb', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-mips1-elf.xz'))
+        self.add_training('MIPSeb', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-mips2-elf.xz'))
+        self.add_training('MIPSeb', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-mips2-elf.xz'))
+        self.add_training('MIPS16', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-mips16-elf.xz'))
+        self.add_training('MIPS16', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-mips16-elf.xz'))
+        self.add_training('MMIX', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-mmix-elf.xz'), repeat=2)
+        self.add_training('MMIX', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-mmix-elf.xz'), repeat=2)
         self.add_training(
-            'MN10300', file=basedir + 'CROSS_COMPILED/minigzip-mn10300-elf.xz'
+            'MN10300', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-mn10300-elf.xz')
         )  # Matsushita MN10300
-        self.add_training('MN10300', file=basedir + 'CROSS_COMPILED/jpegtran-mn10300-elf.xz')
-        self.add_training('Moxie', file=basedir + 'CROSS_COMPILED/minigzip-moxie-elf.xz')
-        self.add_training('Moxie', file=basedir + 'CROSS_COMPILED/jpegtran-moxie-elf.xz')
-        self.add_training('MSP430', file=basedir + 'CROSS_COMPILED/minigzip-msp430-elf.xz')
-        self.add_training('MSP430', file=basedir + 'CROSS_COMPILED/cjpeg-msp430-elf.xz')
+        self.add_training('MN10300', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-mn10300-elf.xz'))
+        self.add_training('Moxie', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-moxie-elf.xz'))
+        self.add_training('Moxie', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-moxie-elf.xz'))
+        self.add_training('MSP430', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-msp430-elf.xz'))
+        self.add_training('MSP430', file=os.path.join(basedir, 'CROSS_COMPILED/cjpeg-msp430-elf.xz'))
         self.add_training(
-            'MSP430', file=basedir + 'CROSS_COMPILED/libz-msp430-elf.o.xz'
+            'MSP430', file=os.path.join(basedir, 'CROSS_COMPILED/libz-msp430-elf.o.xz')
         )  # Could only make object files for MSP430
-        self.add_training('MSP430', file=basedir + 'CROSS_COMPILED/libjpeg-msp430.o.text.xz')
+        self.add_training('MSP430', file=os.path.join(basedir, 'CROSS_COMPILED/libjpeg-msp430.o.text.xz'))
         self.add_training(
-            'NDS32', file=basedir + 'CROSS_COMPILED/minigzip-nds32le-elf.xz'
+            'NDS32', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-nds32le-elf.xz')
         )  # same statistics for nsd32le and nds32be
-        self.add_training('NDS32', file=basedir + 'CROSS_COMPILED/jpegtran-nds32le-elf.xz')
-        self.add_training('NIOS-II', file=basedir + 'CROSS_COMPILED/minigzip-nios2-elf.xz')
-        self.add_training('NIOS-II', file=basedir + 'CROSS_COMPILED/jpegtran-nios2-elf.xz')
+        self.add_training('NDS32', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-nds32le-elf.xz'))
+        self.add_training('NIOS-II', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-nios2-elf.xz'))
+        self.add_training('NIOS-II', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-nios2-elf.xz'))
         self.add_training(
-            'RL78', file=basedir + 'CROSS_COMPILED/libz-rl78-elf.o.xz'
+            'RL78', file=os.path.join(basedir, 'CROSS_COMPILED/libz-rl78-elf.o.xz')
         )  # Could only make object files for RL78; need to patch deflate.c, to avoid SEGV of gcc
         self.add_training(
-            'RL78', file=basedir + 'CROSS_COMPILED/libjpeg-rl78.o.text.xz'
+            'RL78', file=os.path.join(basedir, 'CROSS_COMPILED/libjpeg-rl78.o.text.xz')
         )  # need to patch jdmainct.c, to avoid internal error of gcc
-        self.add_training('RX', file=basedir + 'CROSS_COMPILED/minigzip-rx-elf.xz', section='P')
-        self.add_training('RX', file=basedir + 'CROSS_COMPILED/jpegtran-rx-elf.xz', section='P')
-        self.add_training('SuperH', file=basedir + '__TODO/busybox.net/busybox-sh4')
+        self.add_training('RX', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-rx-elf.xz', section='P'))
+        self.add_training('RX', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-rx-elf.xz', section='P'))
+        self.add_training('SuperH', file=os.path.join(basedir, '__TODO/busybox.net/busybox-sh4'))
         self.add_training(
-            'SuperH', file=basedir + 'CROSS_COMPILED/minigzip-sh-elf.xz'
+            'SuperH', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-sh-elf.xz')
         )  # need to delete divisions from source code, because gcc fails in creating __udivsi3
         self.add_training(
-            'SuperH', file=basedir + 'CROSS_COMPILED/jpegtran-sh-elf.xz'
+            'SuperH', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-sh-elf.xz')
         )  # need to delete divisions from source code, because gcc fails in creating __udivsi3
-        self.add_training('Cell-SPU', file=basedir + 'CROSS_COMPILED/minigzip-spu-elf.xz')
-        self.add_training('Cell-SPU', file=basedir + 'CROSS_COMPILED/jpegtran-spu-elf.xz')
+        self.add_training('Cell-SPU', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-spu-elf.xz'))
+        self.add_training('Cell-SPU', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-spu-elf.xz'))
         self.add_training(
-            'TILEPro', file=basedir + 'CROSS_COMPILED/minigzip-tilepro-elf.xz'
+            'TILEPro', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-tilepro-elf.xz')
         )  # need to patch trees.c, to avoid internal error of gcc
         #       _training('TILEPro',       file = basedir+'CROSS_COMPILED/jpegtran-tilepro-elf.xz') # need to patch jchuff.c, jcphuff.c, jcdctmgr.c and others, to avoid internal error of gcc
-        self.add_training('V850', file=basedir + 'CROSS_COMPILED/minigzip-v850-elf.xz')
-        self.add_training('V850', file=basedir + 'CROSS_COMPILED/jpegtran-v850-elf.xz')
-        self.add_training('Visium', file=basedir + 'CROSS_COMPILED/minigzip-visium-elf.xz')
-        self.add_training('Visium', file=basedir + 'CROSS_COMPILED/jpegtran-visium-elf.xz')
-        self.add_training('Stormy16', file=basedir + 'CROSS_COMPILED/minigzip-xstormy16-elf.xz')
-        self.add_training('Stormy16', file=basedir + 'CROSS_COMPILED/jpegtran-xstormy16-elf.xz')
-        self.add_training('Xtensa', file=basedir + 'CROSS_COMPILED/minigzip-xtensa-elf.xz')
-        self.add_training('Xtensa', file=basedir + 'CROSS_COMPILED/jpegtran-xtensa-elf.xz')
+        self.add_training('V850', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-v850-elf.xz'))
+        self.add_training('V850', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-v850-elf.xz'))
+        self.add_training('Visium', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-visium-elf.xz'))
+        self.add_training('Visium', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-visium-elf.xz'))
+        self.add_training('Stormy16', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-xstormy16-elf.xz'))
+        self.add_training('Stormy16', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-xstormy16-elf.xz'))
+        self.add_training('Xtensa', file=os.path.join(basedir, 'CROSS_COMPILED/minigzip-xtensa-elf.xz'))
+        self.add_training('Xtensa', file=os.path.join(basedir, 'CROSS_COMPILED/jpegtran-xtensa-elf.xz'))
         # Nice exotic architectures found in C-Kermit binaries.
-        self.add_training('M88k', file=basedir + 'c-kermit/cku190.dgux540c-88k.xz')
+        self.add_training('M88k', file=os.path.join(basedir, 'c-kermit/cku190.dgux540c-88k.xz'))
         self.add_training(
             'HP-Focus',
-            file=basedir + 'c-kermit/cku192.hpux500wintcp-s550-5.21.xz',
+            file=os.path.join(basedir, 'c-kermit/cku192.hpux500wintcp-s550-5.21.xz'),
             section=slice(0x0, 0x66000),
         )  # Educated guess for .text section
         self.add_training(
-            'Cray', file=basedir + 'c-kermit/cku189.unicos7y.xz', section=slice(0x0, 0x118000)
+            'Cray', file=os.path.join(basedir, 'c-kermit/cku189.unicos7y.xz'), section=slice(0x0, 0x118000)
         )  # Educated guess for .text section
         self.add_training(
-            'VAX', file=basedir + 'c-kermit/cku192.bellv10-vax.xz', section=slice(0x0, 0x4F800)
+            'VAX', file=os.path.join(basedir, 'c-kermit/cku192.bellv10-vax.xz'), section=slice(0x0, 0x4F800)
         )  # Educated guess for .text section
         self.add_training(
-            'PDP-11', file=basedir + 'c-kermit/cku192.bsd211.xz', section=slice(0x0, 0x1F000)
+            'PDP-11', file=os.path.join(basedir, 'c-kermit/cku192.bsd211.xz'), section=slice(0x0, 0x1F000)
         )  # Educated guess for .text section
         self.add_training(
-            'ROMP', file=basedir + 'c-kermit/cku192.rtaixc-2.2.1-rtpc.xz', section=slice(0x0, 0x6E000)
+            'ROMP', file=os.path.join(basedir, 'c-kermit/cku192.rtaixc-2.2.1-rtpc.xz'), section=slice(0x0, 0x6E000)
         )  # Educated guess for .text section
         self.add_training(
-            'WE32000', file=basedir + 'c-kermit/cku192.att3bx.xz', section=slice(0xD0, 0xD0 + 0x51944)
+            'WE32000', file=os.path.join(basedir, 'c-kermit/cku192.att3bx.xz'), section=slice(0xD0, 0xD0 + 0x51944)
         )  # .text section defined in COFF
         self.add_training(
-            'CLIPPER', file=basedir + 'c-kermit/cku196.clix-3.1.xz', section=slice(0xE0, 0xE0 + 0x108DE0)
+            'CLIPPER', file=os.path.join(basedir, 'c-kermit/cku196.clix-3.1.xz'), section=slice(0xE0, 0xE0 + 0x108DE0)
         )  # .text section defined in COFF
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0x4800, 0x8800)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0x4800, 0x8800)
         )  # .text section seems to be scattered across the file
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0xB800, 0x18800)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0xB800, 0x18800)
         )
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0x1A800, 0x21800)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0x1A800, 0x21800)
         )
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0x23800, 0x29000)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0x23800, 0x29000)
         )
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0x2A800, 0x3A000)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0x2A800, 0x3A000)
         )
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0x3E800, 0x47800)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0x3E800, 0x47800)
         )
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0x4B800, 0x52000)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0x4B800, 0x52000)
         )
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0x54800, 0x59800)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0x54800, 0x59800)
         )
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0x60000, 0x6C000)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0x60000, 0x6C000)
         )
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0x74800, 0x84000)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0x74800, 0x84000)
         )
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0xB4800, 0xC7800)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0xB4800, 0xC7800)
         )
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0xCF000, 0xE4800)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0xCF000, 0xE4800)
         )
         self.add_training(
-            'i860', file=basedir + 'c-kermit/ckl196-i860-vos1333.hex.xz', section=slice(0xEB000, 0xFB000)
+            'i860', file=os.path.join(basedir, 'c-kermit/ckl196-i860-vos1333.hex.xz'), section=slice(0xEB000, 0xFB000)
         )
         # 8-bit CPUs, cannot cross-compile usual open source software, because
         # of size and of pointer size; we compile something else, but the
         # result is small, barely sufficient.
-        self.add_training('8051', file=basedir + 'CROSS_COMPILED/tu-a15-mcs51.hex')
-        self.add_training('8051', file=basedir + 'CROSS_COMPILED/tu-n9-mcs51.hex')
-        self.add_training('8051', file=basedir + 'CROSS_COMPILED/tu-tea-mcs51.hex')
-        self.add_training('8051', file=basedir + 'CROSS_COMPILED/tu-arithmetic-mcs51.hex')
+        self.add_training('8051', file=os.path.join(basedir, 'CROSS_COMPILED/tu-a15-mcs51.hex'))
+        self.add_training('8051', file=os.path.join(basedir, 'CROSS_COMPILED/tu-n9-mcs51.hex'))
+        self.add_training('8051', file=os.path.join(basedir, 'CROSS_COMPILED/tu-tea-mcs51.hex'))
+        self.add_training('8051', file=os.path.join(basedir, 'CROSS_COMPILED/tu-arithmetic-mcs51.hex'))
         self.add_training(
-            '8051', file=basedir + 'CROSS_COMPILED/tu-tea-ds390.hex'
+            '8051', file=os.path.join(basedir, 'CROSS_COMPILED/tu-tea-ds390.hex')
         )  # DS80C390 and DS80C400 are derived from 8051
-        self.add_training('8051', file=basedir + 'CROSS_COMPILED/tu-arithmetic-ds390.hex')
-        self.add_training('STM8', file=basedir + 'CROSS_COMPILED/tu-tea-stm8.hex', repeat=5)
-        self.add_training('STM8', file=basedir + 'CROSS_COMPILED/tu-arithmetic-stm8.hex', repeat=5)
-        self.add_training('68HC08', file=basedir + 'CROSS_COMPILED/tu-tea-hc08-elf', section='CSEG', repeat=2)
+        self.add_training('8051', file=os.path.join(basedir, 'CROSS_COMPILED/tu-arithmetic-ds390.hex'))
+        self.add_training('STM8', file=os.path.join(basedir, 'CROSS_COMPILED/tu-tea-stm8.hex'), repeat=5)
+        self.add_training('STM8', file=os.path.join(basedir, 'CROSS_COMPILED/tu-arithmetic-stm8.hex'), repeat=5)
+        self.add_training('68HC08', file=os.path.join(basedir, 'CROSS_COMPILED/tu-tea-hc08-elf', section='CSEG'), repeat=2)
         self.add_training(
-            '68HC08', file=basedir + 'CROSS_COMPILED/tu-path-hc08-elf', section='CSEG', repeat=2
+            '68HC08', file=os.path.join(basedir, 'CROSS_COMPILED/tu-path-hc08-elf', section='CSEG'), repeat=2
         )
         self.add_training(
-            '68HC08', file=basedir + 'CROSS_COMPILED/tu-arithmetic-hc08-elf', section='CSEG', repeat=2
+            '68HC08', file=os.path.join(basedir, 'CROSS_COMPILED/tu-arithmetic-hc08-elf', section='CSEG'), repeat=2
         )
-        self.add_training('68HC11', file=basedir + 'CROSS_COMPILED/tu-path-m68hc11-elf')
-        self.add_training('68HC11', file=basedir + 'CROSS_COMPILED/tu-arithmetic-m68hc11-elf')
-        self.add_training('Z80', file=basedir + 'CROSS_COMPILED/tu-tea-z80.hex', repeat=2)
-        self.add_training('Z80', file=basedir + 'CROSS_COMPILED/tu-path-z80.hex', repeat=2)
-        self.add_training('Z80', file=basedir + 'CROSS_COMPILED/tu-arithmetic-z80.hex', repeat=2)
-        self.add_training('TLCS-90', file=basedir + 'CROSS_COMPILED/tu-tea-tlcs90.hex', repeat=2)
-        self.add_training('TLCS-90', file=basedir + 'CROSS_COMPILED/tu-path-tlcs90.hex', repeat=2)
-        self.add_training('TLCS-90', file=basedir + 'CROSS_COMPILED/tu-arithmetic-tlcs90.hex', repeat=2)
+        self.add_training('68HC11', file=os.path.join(basedir, 'CROSS_COMPILED/tu-path-m68hc11-elf'))
+        self.add_training('68HC11', file=os.path.join(basedir, 'CROSS_COMPILED/tu-arithmetic-m68hc11-elf'))
+        self.add_training('Z80', file=os.path.join(basedir, 'CROSS_COMPILED/tu-tea-z80.hex'), repeat=2)
+        self.add_training('Z80', file=os.path.join(basedir, 'CROSS_COMPILED/tu-path-z80.hex'), repeat=2)
+        self.add_training('Z80', file=os.path.join(basedir, 'CROSS_COMPILED/tu-arithmetic-z80.hex'), repeat=2)
+        self.add_training('TLCS-90', file=os.path.join(basedir, 'CROSS_COMPILED/tu-tea-tlcs90.hex'), repeat=2)
+        self.add_training('TLCS-90', file=os.path.join(basedir, 'CROSS_COMPILED/tu-path-tlcs90.hex'), repeat=2)
+        self.add_training('TLCS-90', file=os.path.join(basedir, 'CROSS_COMPILED/tu-arithmetic-tlcs90.hex'), repeat=2)
         # PIC10 and PIC16 from http://www.pic24.ru/doku.php/en/osa/ref/examples/intro
-        self.add_training('PIC10', file=basedir + 'PIC10/3leds_pic10f222.hex', repeat=10)
-        self.add_training('PIC16', file=basedir + 'PIC16/quartet.hex', repeat=10)
+        self.add_training('PIC10', file=os.path.join(basedir, 'PIC10/3leds_pic10f222.hex'), repeat=10)
+        self.add_training('PIC16', file=os.path.join(basedir, 'PIC16/quartet.hex'), repeat=10)
         # PIC18 from https://github.com/radare/radare2-regressions/blob/master/bins/pic18c/FreeRTOS-pic18c.hex
-        self.add_training('PIC18', file=basedir + 'PIC18/FreeRTOS-pic18c.hex', repeat=5)
+        self.add_training('PIC18', file=os.path.join(basedir, 'PIC18/FreeRTOS-pic18c.hex'), repeat=5)
         # PIC24 from https://raw.githubusercontent.com/mikebdp2/Bus_Pirate/master/package_latest/BPv4/firmware/bpv4_fw7.0_opt0_18092016.hex
         self.add_training(
-            'PIC24', file=basedir + 'PIC24/bpv4_fw7.0_opt0_18092016.hex', section=slice(0x8830, 0x1D2E0)
+            'PIC24', file=os.path.join(basedir, 'PIC24/bpv4_fw7.0_opt0_18092016.hex'), section=slice(0x8830, 0x1D2E0)
         )
         # 6502 binary compiled with https://github.com/cc65/cc65
         # This appears to be more compiler-dependent than CPU-dependent, the
         # statistics are very different from an AppleII ROM, for example.
-        self.add_training('#6502#cc65', file=basedir + 'CROSS_COMPILED/tu-tea-cc65', repeat=5)
-        self.add_training('#6502#cc65', file=basedir + 'CROSS_COMPILED/tu-path-cc65', repeat=5)
-        self.add_training('#6502#cc65', file=basedir + 'CROSS_COMPILED/tu-arithmetic-cc65', repeat=5)
+        self.add_training('#6502#cc65', file=os.path.join(basedir, 'CROSS_COMPILED/tu-tea-cc65'), repeat=5)
+        self.add_training('#6502#cc65', file=os.path.join(basedir, 'CROSS_COMPILED/tu-path-cc65'), repeat=5)
+        self.add_training('#6502#cc65', file=os.path.join(basedir, 'CROSS_COMPILED/tu-arithmetic-cc65'), repeat=5)
         # Other 6502 binary, downloaded from https://raw.githubusercontent.com/RolfRolles/Atredis2018/master/MemoryDump/data-4000-efff.bin
         # This is not a lot of data, but seems sufficient
         self.add_training(
-            '6502', file=basedir + '6502/data-4000-efff.bin', section=slice(0x4000, 0x4542), repeat=5
+            '6502', file=os.path.join(basedir, '6502/data-4000-efff.bin'), section=slice(0x4000, 0x4542), repeat=5
         )
         # CUDA from http://jcuda.org/samples/matrixInvert%200.0.1%20CUBIN%2032bit.zip
         # Not a lot of data either
         self.add_training(
             'CUDA',
-            file=basedir + 'CUDA/kernels32/GPUeliminateRest_kernel.cubin',
+            file=os.path.join(basedir, 'CUDA/kernels32/GPUeliminateRest_kernel.cubin'),
             section=slice(0x477, 0x477 + 0xAA0),
             repeat=5,
         )
         # WebAssembly from https://github.com/mdn/webassembly-examples/blob/master/wasm-sobel/change.wasm
-        self.add_training('WASM', file=basedir + 'WASM/change.wasm')
+        self.add_training('WASM', file=os.path.join(basedir, 'WASM/change.wasm'))
         # H8S-2117A from https://github.com/airbus-seclab/cpu_rec/issues/4
-        self.add_training('H8S', file=basedir + 'H8S/bridge7757.mot.bin', section=slice(0x210C, 0x1671E))
+        self.add_training('H8S', file=os.path.join(basedir, 'H8S/bridge7757.mot.bin'), section=slice(0x210C, 0x1671E))
         # TriMedia from https://github.com/crackinglandia/trimedia/blob/master/tm-linux/tmlinux-kernel-obj-latest.tar.bz2
         self.add_training(
             'TriMedia',
-            file=basedir + 'trimedia/linux-obj/fs/built-in.o',
+            file=os.path.join(basedir, 'trimedia/linux-obj/fs/built-in.o'),
             section=slice(0x400, 0x400 + 0x73ACF),
         )  # .text section
         # Nec/Renesas 78k is used in Metz flash units, cf. https://debugmo.de/2011/10/whats-inside-metz-50-af-1-n/
         self.add_training(
-            '78k', file=basedir + 'Metz/MB50AF1_NikonV12.bin', section=slice(0x2BA, 0x2BA + 0x7D5A)
+            '78k', file=os.path.join(basedir, 'Metz/MB50AF1_NikonV12.bin'), section=slice(0x2BA, 0x2BA + 0x7D5A)
         )
         # TriCore is used in Volkswagen's ECU, cf. https://debugmo.de/2015/12/dieselgate/
         self.add_training(
-            'TriCore', file=basedir + 'Volkswagen/FL_03L906018HK_3533.bin', section=slice(0xA094C, 0x1EA48C)
+            'TriCore', file=os.path.join(basedir, 'Volkswagen/FL_03L906018HK_3533.bin'), section=slice(0xA094C, 0x1EA48C)
         )
         # OCaml bytecode, having non-standard statistical properties.
-        self.add_training('OCaml', file=basedir + 'OCaml/camlp4', section=slice(0x1A, 0xEC856))
+        self.add_training('OCaml', file=os.path.join(basedir, 'OCaml/camlp4'), section=slice(0x1A, 0xEC856))
         log.info(
             "Training set of size %d is read; %s different CPUs known",
             len(self.archs),
