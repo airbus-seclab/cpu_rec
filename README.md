@@ -1,28 +1,27 @@
 # Description
-`cpu_rec` is a tool that recognizes cpu instructions
+`cpu_rec` is a tool that recognizes CPU instructions
 in an arbitrary binary file.
-It can be used as a standalone tool, or as a plugin for binwalk
-(https://github.com/devttys0/binwalk).
+It can be used as a standalone tool, or as a plugin for
+[binwalk](https://github.com/devttys0/binwalk).
 
 # Installation instructions
 ## Standalone tool
 1. Copy `cpu_rec.py` and `cpu_rec_corpus` in the same directory.
-2. If you don't have the `lzma` module installed for your python (this
-   tool works either with python3 or with python2 >= 2.4) then you
+2. If you don't have the `lzma` module installed for your python then you
    should `unxz` the corpus files in `cpu_rec_corpus`.
 3. If you want to enhance the corpus, you can add new data in the
    corpus directory. If you want to create your own corpus, please
    look at the method `build_default_corpus` in the source code.
 
 ## For use as a binwalk module
+
 Same as above, but the installation directory must be the binwalk
 module directory: `$HOME/.config/binwalk/modules`.
 
-You'll need a recent version of binwalk, that includes the patch
-provided by https://github.com/devttys0/binwalk/pull/241 .
-
 # How to use the tool
+
 ## As a binwalk module
+
 Add the flag `-%` when using binwalk.
 
 Be patient. Waiting a few minutes for the result is to be expected.
@@ -34,6 +33,7 @@ if you know that your binary is not one of them (typically Cray or
 MMIX are not found in a firmware).
 
 ## As a standalone tool
+
 Just run the tool, with the binary file(s) to analyze as argument(s)
 The tool will try to match an architecture for the whole file, and
 then to detect the largest binary chunk that corresponds to a CPU
@@ -47,11 +47,10 @@ makes the tool very verbose; this is helpful when adding a new
 architecture to the corpus or when there are doubts on the raw result
 of the tool.
 
-If https://github.com/LRGH/elfesteem is installed, then the
-tool also extract the text section from ELF, PE, Mach-O or COFF
-files, and outputs the architecture corresponding to this section;
-the possibility of extracting the text section is also used when
-building a corpus from full binary files.
+If [lief](https://lief-project.github.io) is installed, then the tool also
+extracts the text section from supported files, and outputs the architecture
+corresponding to this section; the possibility of extracting the text section
+is also used when building a corpus from full binary files.
 
 Option `-d` followed by a directory dumps the corpus in that directory;
 using this option one can reconstruct the default corpus.
@@ -59,8 +58,8 @@ using this option one can reconstruct the default corpus.
 ## As a python module
 The function `which_arch` takes a bytestring as input and outputs
 the name of the architecture, or None.
-Loading the training data is done during the first call of which_arch,
-and calling which_arch with no argument does this precomputation only.
+Loading the training data is done during the first call of `which_arch`,
+and calling `which_arch` with no argument does this precomputation only.
 
 For example
 ```
@@ -72,6 +71,7 @@ For example
 ```
 
 ## Create a corpus or extend the existing corpus
+
 Each architecture is defined by a file in `cpu_rec_corpus`.
 Only file names ending with `.corpus`, which can be compressed with `xz`.
 

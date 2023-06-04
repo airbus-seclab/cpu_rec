@@ -1,11 +1,6 @@
 #! /usr/bin/env python3
-# Tested with python >= 2.4
-
-# cpu_rec.py is a tool that recognizes cpu instructions
-# in an arbitrary binary file.
-# It can be used as a standalone tool, or as a plugin for binwalk
-
 # Copyright 2017-2019. Airbus -- Louis Granboulan
+# Copyright 2023 Raphaël Rigo
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,50 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
-# Installation instructions:
-#   1. Copy this file and the content of cpu_rec_corpus in the directory
-#      of your choice.
-#   2. If you don't have the lzma module installed for your python (this
-#      tool works either with python3 or with recent python2) then you
-#      should unxz the corpus files.
-#   3. If you want to enhance the corpus, you can add new data in the
-#      corpus directory. If you want to create your own corpus, please
-#      look at the method 'read_corpus' below.
-
-# Installation instructions, for use as a binwalk module:
-#   Same as above, but the installation directory must be the binwalk
-#   module directory: $HOME/.config/binwalk/modules .
-#   You'll need a recent version of binwalk, that includes the patch
-#   provided by https://github.com/devttys0/binwalk/pull/241 .
-
-# How to use the tool as a binwalk module:
-#   Add the flag -% when using binwalk.
-
-# How to use the tool as a standalone tool:
-#   Just run the tool, with the binary file(s) to analyze as argument(s)
-#   The tool will try to match an architecture for the whole file, and
-#   then to detect the largest binary chunk that corresponds to a CPU
-#   architecture; usually it is the right answer.
-#   If the result is not satisfying, prepending twice -v to the arguments
-#   makes the tool very verbose; this is helpful when adding a new
-#   architecture to the corpus.
-#   If https://github.com/airbus-seclab/elfesteem is installed, then the
-#   tool also extract the text section from ELF, PE, Mach-O or COFF
-#   files, and outputs the architecture corresponding to this section;
-#   the possibility of extracting the text section is also used when
-#   building a corpus from full binary files.
-#   Option -d followed by a directory dumps the corpus in that directory;
-#   using this option one can reconstruct the default corpus.
-
-# How to use the tool as a python module:
-#   from cpu_rec import which_arch
-#   Call which_arch with a bytestring as input; the answer is the name
-#   of the architecture detected, or None.
-#   Loading the training data is done during the first call of which_arch,
-#   and calling which_arch with no argument does this precomputation only.
-
 
 import sys
 import struct
