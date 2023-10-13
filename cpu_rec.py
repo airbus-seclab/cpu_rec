@@ -263,7 +263,7 @@ class TrainingData(object):
         return data
     def read_corpus(self):
         """ Gets the raw training dataset """
-        basedir = os.path.dirname(__file__)
+        basedir = os.path.dirname(os.path.realpath(__file__))
         if basedir != '': basedir += '/'
         # If the default training set has been installed along cpu_rec.py,
         # we use it.
