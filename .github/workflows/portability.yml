@@ -32,12 +32,17 @@ jobs:
     - name: Analyze /bin/sh
       run: |
         python ./cpu_rec.py /bin/sh
+    - name: Same, but should be faster because using pickled data
+      run: |
+        python ./cpu_rec.py /bin/sh
+        rm stats.pick
     - name: Analyze /bin/sh with LRGH's elfesteem
       run: |
         git clone https://github.com/LRGH/elfesteem
         export PYTHONPATH=./elfesteem
         python ./cpu_rec.py /bin/sh
         rm -rf elfesteem
+        rm stats.pick
     - name: Analyze /bin/sh with airbus-seclab's elfesteem
       if: ${{ steps.pyver.outputs.pyver == 2 && matrix.os != 'macos-latest' }}
       # To check why it does not work with MacOSX
@@ -46,6 +51,7 @@ jobs:
         export PYTHONPATH=./elfesteem
         python ./cpu_rec.py /bin/sh
         rm -rf elfesteem
+        rm stats.pick
 
   python24:
     runs-on: "ubuntu-latest"
@@ -67,6 +73,10 @@ jobs:
     - name: Analyze /bin/sh
       run: |
         python ./cpu_rec.py /bin/sh
+    - name: Same, but should be faster because using pickled data
+      run: |
+        python ./cpu_rec.py /bin/sh
+        rm stats.pick
     - name: Analyze /bin/sh with LRGH's elfesteem
       run: |
         git clone https://github.com/LRGH/elfesteem

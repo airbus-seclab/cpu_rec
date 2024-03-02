@@ -66,6 +66,7 @@
 
 
 import sys, struct, os
+import pickle
 from time import time
 import logging
 log = logging.getLogger("cpu_rec")
@@ -756,13 +757,40 @@ if __name__ == "__main__":
         if len(argv) and argv[0] == '-v':
             log.setLevel(logging.DEBUG)
             argv = argv[1:]
-    t = TrainingData()
-    t.read_corpus()
-    p = FileAnalysis(t)
     if dump:
+        # Always recompute data for dump
+        t = TrainingData()
+        t.read_corpus()
+        p = FileAnalysis(t)
         t.dump(dumpdir=dumpdir)
         p.dump(dumpdir=dumpdir)
         sys.exit(0)
+    # The pickled data might depend on the version of python, it is not
+    # ditributed with cpu_rec and shall be erased in case of python
+    # update or in case of addition of a new architecture in the corpus.
+    # NB: there is a race condition, if "stats.pick" is created by
+    # another program between os.path.isfile and open, it is overwritten.
+    pickled_data = os.path.join(os.path.dirname(__file__), "stats.pick")
+    if os.path.isfile(pickled_data):
+        log.info("Loading training data from pickled file")
+        t, p = pickle.load(open(pickled_data, "rb"))
+    else:
+        log.info("Pickled training data not found, loading from corpus")
+        t = TrainingData()
+        t.read_corpus()
+        p = FileAnalysis(t)
+        log.info("Saving pickled training data")
+        try:
+            f = open(pickled_data, "wb")
+            pickle.dump((t, p), f)
+            f.close()
+        except OSError:
+            log.warning("Could not save cached training data")
+        except TypeError:
+            # Using Cpython 2, fails with "can't pickle instancemethod objects"
+            # But works with pypy-2.7, for example
+            log.warning("Can't pickle with this version of python")
+            os.unlink(pickled_data)
     for f in argv:
         sys.stdout.write('%-80s'%f)
         sys.stdout.flush()
