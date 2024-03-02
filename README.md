@@ -292,4 +292,5 @@ and was distributed for the Atredis BlackHat 2018 challenge, under an unknown li
 
 ## Development status
 
+[![Portability](https://github.com/airbus-seclab/cpu_rec/actions/workflows/portability.yml/badge.svg)](https://github.com/airbus-seclab/cpu_rec/actions/workflows/portability.yml)
 [![Code Quality](https://img.shields.io/lgtm/grade/python/g/airbus-seclab/cpu_rec.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/airbus-seclab/cpu_rec/context:python)

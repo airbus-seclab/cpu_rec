@@ -1,0 +1,75 @@
+name: Testing portability (OS and python version)
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-20.04", "ubuntu-latest", "macos-latest"]
+        python-version: ["3.10", "pypy2.7", "pypy3.9", "graalpy-22.3"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Compute python major version
+      id: pyver
+      run: |
+        python -c 'import sys;print("pyver=%s"%sys.version_info[0])' >> "$GITHUB_OUTPUT"
+    - name: pypy2.7 does not have lzma by default
+      if: ${{ matrix.python-version == 'pypy2.7' }}
+      run: |
+        if test Linux = `uname -s`; then sudo apt-get install xz-utils; fi
+        unxz cpu_rec_corpus/*.xz
+    - name: Analyze /bin/sh
+      run: |
+        python ./cpu_rec.py /bin/sh
+    - name: Analyze /bin/sh with LRGH's elfesteem
+      run: |
+        git clone https://github.com/LRGH/elfesteem
+        export PYTHONPATH=./elfesteem
+        python ./cpu_rec.py /bin/sh
+        rm -rf elfesteem
+    - name: Analyze /bin/sh with airbus-seclab's elfesteem
+      if: ${{ steps.pyver.outputs.pyver == 2 && matrix.os != 'macos-latest' }}
+      # To check why it does not work with MacOSX
+      run: |
+        git clone https://github.com/airbus-seclab/elfesteem
+        export PYTHONPATH=./elfesteem
+        python ./cpu_rec.py /bin/sh
+        rm -rf elfesteem
+
+  python24:
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 2.4
+      run: |
+        cd ..
+        curl -O https://www.python.org/ftp/python/2.4.6/Python-2.4.6.tgz
+        tar xzf Python-2.4.6.tgz
+        cd Python-2.4.6
+        ./configure
+        make
+        export PATH=$(pwd):$PATH
+        cd ../cpu_rec
+        python -c 'import sys;print(sys.version)'
+    - name: Analyze /bin/sh
+      run: |
+        python ./cpu_rec.py /bin/sh
+    - name: Analyze /bin/sh with LRGH's elfesteem
+      run: |
+        git clone https://github.com/LRGH/elfesteem
+        export PYTHONPATH=./elfesteem
+        python ./cpu_rec.py /bin/sh
+        rm -rf elfesteem
