@@ -73,3 +73,22 @@ jobs:
         export PYTHONPATH=./elfesteem
         python ./cpu_rec.py /bin/sh
         rm -rf elfesteem
+
+  test-C:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "macos-latest"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Uncompress corpus
+      run: |
+        cp -r cpu_rec_corpus /tmp
+        unxz /tmp/cpu_rec_corpus/*.xz
+    - name: Compile cpu_rec
+      run: |
+        gcc -O3 -o cpu_rec cpu_rec.c -lm
+    - name: Analyze /bin/sh
+      run: |
+        ./cpu_rec /bin/sh | sort +1
