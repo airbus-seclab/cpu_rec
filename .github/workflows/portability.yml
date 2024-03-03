@@ -31,27 +31,43 @@ jobs:
         unxz cpu_rec_corpus/*.xz
     - name: Analyze /bin/sh
       run: |
-        python ./cpu_rec.py /bin/sh
+        python ./cpu_rec.py -v /bin/sh
     - name: Same, but should be faster because using pickled data
       run: |
-        python ./cpu_rec.py /bin/sh
-        rm stats.pick
-    - name: Analyze /bin/sh with LRGH's elfesteem
+        python ./cpu_rec.py -v /bin/sh
+    - name: Install three variants of elfesteem
       run: |
         git clone https://github.com/LRGH/elfesteem
-        export PYTHONPATH=./elfesteem
-        python ./cpu_rec.py /bin/sh
-        rm -rf elfesteem
-        rm stats.pick
+        mv elfesteem elfesteem.LRGH
+        git clone https://github.com/airbus-seclab/elfesteem
+        mv elfesteem elfesteem.seclab
+        git clone https://github.com/serpilliere/elfesteem
+        mv elfesteem elfesteem.serpi
+    - name: Analyze /bin/sh with LRGH's elfesteem
+      run: |
+        export PYTHONPATH=./elfesteem.LRGH
+        python ./cpu_rec.py -v /bin/sh
     - name: Analyze /bin/sh with airbus-seclab's elfesteem
       if: ${{ steps.pyver.outputs.pyver == 2 && matrix.os != 'macos-latest' }}
-      # To check why it does not work with MacOSX
+      # Cannot parse Mach-O
       run: |
-        git clone https://github.com/airbus-seclab/elfesteem
-        export PYTHONPATH=./elfesteem
-        python ./cpu_rec.py /bin/sh
-        rm -rf elfesteem
-        rm stats.pick
+        export PYTHONPATH=./elfesteem.seclab
+        python ./cpu_rec.py -v /bin/sh
+    - name: Analyze /bin/sh with serpilliere's elfesteem
+      if: ${{ steps.pyver.outputs.pyver == 2 && matrix.os != 'macos-latest' }}
+      # Cannot parse Mach-O
+      run: |
+        export PYTHONPATH=./elfesteem.serpi
+        python ./cpu_rec.py -v /bin/sh
+    - name: Install lief
+      if: ${{ steps.pyver.outputs.pyver == 3 && !(matrix.os == 'macos-latest' && matrix.python-version == 'graalpy-22.3') }}
+      # To check why lief/graalpy does not work with MacOSX
+      run: |
+        pip install lief
+    - name: Analyze /bin/sh with lief
+      if: ${{ steps.pyver.outputs.pyver == 3 && !(matrix.os == 'macos-latest' && matrix.python-version == 'graalpy-22.3') }}
+      run: |
+        python ./cpu_rec.py -v /bin/sh
 
   python24:
     runs-on: "ubuntu-latest"
@@ -72,17 +88,17 @@ jobs:
         python -c 'import sys;print(sys.version)'
     - name: Analyze /bin/sh
       run: |
-        python ./cpu_rec.py /bin/sh
+        python ./cpu_rec.py -v /bin/sh
     - name: Same, but should be faster because using pickled data
       run: |
-        python ./cpu_rec.py /bin/sh
-        rm stats.pick
-    - name: Analyze /bin/sh with LRGH's elfesteem
+        python ./cpu_rec.py -v /bin/sh
+    - name: Install elfesteem
       run: |
         git clone https://github.com/LRGH/elfesteem
+    - name: Analyze /bin/sh with LRGH's elfesteem
+      run: |
         export PYTHONPATH=./elfesteem
-        python ./cpu_rec.py /bin/sh
-        rm -rf elfesteem
+        python ./cpu_rec.py -v /bin/sh
 
   test-C:
     runs-on: ${{ matrix.os }}

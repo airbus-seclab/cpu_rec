@@ -48,11 +48,15 @@
 #   If the result is not satisfying, prepending twice -v to the arguments
 #   makes the tool very verbose; this is helpful when adding a new
 #   architecture to the corpus.
-#   If https://github.com/airbus-seclab/elfesteem is installed, then the
+#   If https://github.com/LRGH/elfesteem is installed, then the
 #   tool also extract the text section from ELF, PE, Mach-O or COFF
 #   files, and outputs the architecture corresponding to this section;
 #   the possibility of extracting the text section is also used when
 #   building a corpus from full binary files.
+#   NB: other versions than LRGH's need python 2.
+#   If https://lief-project.github.io/ is installed, then the tool can
+#   also extract ELF, PE or Mach-O text sections.
+#   NB: lief needs python 3.
 #   Option -d followed by a directory dumps the corpus in that directory;
 #   using this option one can reconstruct the default corpus.
 
@@ -92,7 +96,7 @@ class TrainingData(object):
         self.files = []
         self.data = []
     def dump(self, dumpdir=None):
-        """ Dump the raw corpus, in a form that won't need elftesteem to be loaded """
+        """ Dump the raw corpus, in a form that won't need elfesteem to be loaded """
         for arch, data in zip(self.archs, self.data):
             of = open(dumpdir+'/'+arch.replace('/','-')+'.corpus', 'ab')
             of.write(data)
@@ -117,7 +121,8 @@ class TrainingData(object):
             elif isinstance(section, slice):
                 data = data[section]
             elif isinstance(section, str):
-                data = TrainingData.extract_section(data, section=section)
+                d_txt = TrainingData.extract_section_elfesteem(data, section=section)
+                if d_txt != None: data = d_txt
             else:
                 raise TypeError("Invalid type %s for section in add_training"%section.__class__.__name__)
         else:
@@ -220,13 +225,15 @@ class TrainingData(object):
             data = TrainingData.unpack_chex(data)
         return data
     @staticmethod
-    def extract_section(data, section=False):
+    def extract_section_elfesteem(data, section=False):
         # Extract text sections from know containers
         # elfesteem has to be installed
         try:
             import elfesteem
         except ImportError:
-            return data
+            log.info("Could not load elfesteem")
+            return None
+        log.info("Extracting %s section with elfesteem", section)
         magic = ( 0x7f,0x45,0x4c,0x46 )
         if data.startswith(struct.pack("%dB"%len(magic),*magic)):
             from elfesteem import elf_init
@@ -262,6 +269,25 @@ class TrainingData(object):
         except ValueError:
             pass
         return data
+    @staticmethod
+    def extract_section_lief(data, section=None):
+        # Extract text sections from know containers
+        # elfesteem has to be installed
+        try:
+            import lief
+        except ImportError:
+            log.info("Could not load lief")
+            return None
+        log.info("Extracting %s section with lief", section)
+        l = lief.parse(data)
+        if not l:
+            return data
+        res = b""
+        section_names = [section] if section else [".text", "__TEXT"]
+        for s in l.sections:
+            if s.name in section_names:
+                res += s.content
+        return res
     def read_corpus(self):
         """ Gets the raw training dataset """
         basedir = os.path.dirname(os.path.realpath(__file__))
@@ -739,24 +765,30 @@ def which_arch(d = None, training = {}):
 
 
 if __name__ == "__main__":
-    fast, dump = False, False
+    fast, dump, use_lief = False, False, False
     argv = sys.argv[1:]
-    if len(argv) and argv[0] == '-d':
-        dump = True
-        assert len(argv) == 2
-        dumpdir = argv[1]
-        if not os.path.isdir(dumpdir):
-            log.error("Directory %r should be created before running the tool", dumpdir)
-            sys.exit(1)
-    if len(argv) and argv[0] == '-f':
-        fast = True
-        argv = argv[1:]
-    if len(argv) and argv[0] == '-v':
-        log.setLevel(logging.INFO)
-        argv = argv[1:]
-        if len(argv) and argv[0] == '-v':
-            log.setLevel(logging.DEBUG)
+    while len(argv):
+        if argv[0] == '-d':
+            dump = True
+            assert len(argv) == 2
+            dumpdir = argv[1]
+            if not os.path.isdir(dumpdir):
+                log.error("Directory %r should be created before running the tool", dumpdir)
+                sys.exit(1)
+        elif argv[0] == '-f':
+            fast = True
             argv = argv[1:]
+        elif argv[0] == '-l':
+            use_lief = True
+            argv = argv[1:]
+        elif argv[0] == '-v':
+            if log.getEffectiveLevel() == 30:
+                log.setLevel(logging.INFO)
+            else:
+                log.setLevel(logging.DEBUG)
+            argv = argv[1:]
+        else:
+            break
     if dump:
         # Always recompute data for dump
         t = TrainingData()
@@ -803,8 +835,13 @@ if __name__ == "__main__":
         log.debug("                   %s", r2[:4])
         log.debug("                   %s", r3[:4])
         # Text section, if possible
-        d_txt = TrainingData.extract_section(d, section='text')
-        if len(d) != len(d_txt):
+        if use_lief:
+            d_txt = TrainingData.extract_section_lief(d, section='text')
+        else:
+            d_txt = TrainingData.extract_section_elfesteem(d, section='text')
+            if d_txt == None:
+                d_txt = TrainingData.extract_section_lief(d, section='text')
+        if d_txt != None:
             res, r2, r3 = p.deduce(d_txt)
             sys.stdout.write('%-15s%-10s' % ('text(%#x)' % len(d_txt), res))
         else:

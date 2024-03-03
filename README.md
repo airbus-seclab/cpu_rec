@@ -53,6 +53,10 @@ files, and outputs the architecture corresponding to this section;
 the possibility of extracting the text section is also used when
 building a corpus from full binary files.
 
+If https://lief-project.github.io/ is installed, then the tool can
+use it instead of elfesteem. If both are installed, option '-l'
+gives priority to lief.
+
 Option `-d` followed by a directory dumps the corpus in that directory;
 using this option one can reconstruct the default corpus.
 
