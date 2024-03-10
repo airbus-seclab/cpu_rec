@@ -780,12 +780,16 @@ def load_training():
         log.info("Loading training data from pickled file")
         try:
             of = open(pickled_data, "rb")
+        except Exception:
+            of = None
+            log.info("Pickle file could not be read")
+        if of is not None:
             try:
                 p = pickle.load(of)
+            except Exception:
+                log.info("Pickled training data could not be loaded")
             finally:
                 of.close()
-        except Exception:
-            log.info("Pickled training data could not be loaded")
     if p is None:
         log.info("No pickled training data, loading from corpus")
         t = TrainingData()
@@ -795,16 +799,20 @@ def load_training():
         log.info("Saving pickled training data")
         try:
             of = open(pickled_data, "wb")
+        except Exception:
+            of = None
+            log.info("Pickle file could not be written")
+        if of is not None:
             try:
                 pickle.dump(p, of)
+            except OSError:
+                log.warning("Could not save cached training data")
+            except TypeError:
+                # Sometimes fails with "can't pickle instancemethod objects"
+                log.warning("Can't pickle with this version of python")
+                os.unlink(pickled_data)
             finally:
                 of.close()
-        except OSError:
-            log.warning("Could not save cached training data")
-        except TypeError:
-            # Sometimes fails with "can't pickle instancemethod objects"
-            log.warning("Can't pickle with this version of python")
-            os.unlink(pickled_data)
     return p
 
 training_global_variable = None
