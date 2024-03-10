@@ -282,8 +282,11 @@ class TrainingData(object):
         l = lief.parse(data)
         if not l:
             return data
-        res = b""
-        section_names = [section] if section else [".text", "__TEXT"]
+        res = struct.pack("")
+        if section:
+            section_names = [section]
+        else:
+            section_names = [".text", "__TEXT"]
         for s in l.sections:
             if s.name in section_names:
                 res += s.content

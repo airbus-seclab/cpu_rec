@@ -86,9 +86,14 @@ jobs:
         cd Python-2.4.6
         ./configure
         make
-        export PATH=$(pwd):$PATH
-        cd ../cpu_rec
+        sudo ln -fs $(pwd)/python /usr/local/bin/python
+    - name: Test python version
+      run: |
         python -c 'import sys;print(sys.version)'
+        python -V
+    - name: Uncompress corpus (no lzma module in python2.4)
+      run: |
+        unxz cpu_rec_corpus/*.xz
     - name: Analyze /bin/sh
       run: |
         python ./cpu_rec.py -v /bin/sh
