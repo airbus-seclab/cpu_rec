@@ -84,7 +84,7 @@ if not len(log.handlers):
 
 # NB: we get a string in python2 and bytes in python3
 if sys.version_info[0] == 2:
-    byte_ord = lambda i: ord(i)
+    byte_ord = ord
 else:
     byte_ord = lambda i: i
 
@@ -98,9 +98,13 @@ class TrainingData(object):
     def dump(self, dumpdir=None):
         """ Dump the raw corpus, in a form that won't need elfesteem to be loaded """
         for arch, data in zip(self.archs, self.data):
+            # We use the try ... finally syntax because the with ... as
+            # syntax is not compatible with python2.4
             of = open(dumpdir+'/'+arch.replace('/','-')+'.corpus', 'ab')
-            of.write(data)
-            of.close()
+            try:
+                of.write(data)
+            finally:
+                of.close()
     def add_training(self, arch, file=None, section='text', data=None, repeat=1):
         """ Add a new item in the training corpus:
             'arch': architecture name
@@ -115,7 +119,11 @@ class TrainingData(object):
             'repeat': when the corpus is too small, we repeat it
         """
         if data is None:
-            data = TrainingData.unpack_file(open(file, 'rb').read())
+            of = open(file, 'rb')
+            try:
+                data = TrainingData.unpack_file(of.read())
+            finally:
+                of.close()
             if section is None:
                 pass
             elif isinstance(section, slice):
@@ -267,6 +275,7 @@ class TrainingData(object):
                 if sh.name.strip('\0') == section:
                     return data[sh.offset:sh.offset+sh.rawsize]
         except ValueError:
+            # No text section could be extracted
             pass
         return data
     @staticmethod
@@ -578,6 +587,7 @@ class MarkovCrossEntropy(object):
         #   With a sufficiently large corpus, they are equivalent...
         if   FreqVariant == 'A': base_count = 0.01
         elif FreqVariant == 'B': base_count = 0
+        else: raise ValueError("FreqVariant=%r"%FreqVariant)
         # Don't use defaultdict: it takes more memory and is slower
         self.counts = {}
         self.Q = {}
@@ -643,11 +653,13 @@ class FileAnalysis(object):
     def dump(self, dumpdir=None):
         for arch in self.archs:
             of = open(dumpdir+'/'+arch.replace('/','-')+'.stat', 'w')
-            of.write('stats = {\n')
-            of.write('"M2": {\n%s},\n' % self.m2.dump(arch))
-            of.write('"M3": {\n%s},\n' % self.m3.dump(arch))
-            of.write('}\n')
-            of.close()
+            try:
+                of.write('stats = {\n')
+                of.write('"M2": {\n%s},\n' % self.m2.dump(arch))
+                of.write('"M3": {\n%s},\n' % self.m3.dump(arch))
+                of.write('}\n')
+            finally:
+                of.close()
     def __init__(self, t):
         self.archs = set(t.archs)
         self.m2 = MarkovCrossEntropy(t)
@@ -767,8 +779,12 @@ def load_training():
     if os.path.isfile(pickled_data):
         log.info("Loading training data from pickled file")
         try:
-            p = pickle.load(open(pickled_data, "rb"))
-        except BaseException:
+            of = open(pickled_data, "rb")
+            try:
+                p = pickle.load(of)
+            finally:
+                of.close()
+        except Exception:
             log.info("Pickled training data could not be loaded")
     if p is None:
         log.info("No pickled training data, loading from corpus")
@@ -778,9 +794,11 @@ def load_training():
         del t
         log.info("Saving pickled training data")
         try:
-            f = open(pickled_data, "wb")
-            pickle.dump(p, f)
-            f.close()
+            of = open(pickled_data, "wb")
+            try:
+                pickle.dump(p, of)
+            finally:
+                of.close()
         except OSError:
             log.warning("Could not save cached training data")
         except TypeError:
@@ -789,12 +807,14 @@ def load_training():
             os.unlink(pickled_data)
     return p
 
-def which_arch(d = None, training = {}):
-    if not 'p' in training:
-        training['p'] = load_training()
+training_global_variable = None
+def which_arch(d = None):
+    global training_global_variable
+    if training_global_variable is None:
+        training_global_variable = load_training()
     if d is None:
         return None
-    res, r2, r3 = training['p'].deduce(d)
+    res, r2, r3 = training_global_variable.deduce(d)
     return res
 
 
@@ -836,7 +856,11 @@ if __name__ == "__main__":
         sys.stdout.write('%-80s'%f)
         sys.stdout.flush()
         # Full file
-        d = TrainingData.unpack_file(open(f, 'rb').read())
+        of = open(f, 'rb')
+        try:
+            d = TrainingData.unpack_file(of.read())
+        finally:
+            of.close()
         res, r2, r3 = p.deduce(d)
         sys.stdout.write('%-15s%-10s' % ('full(%#x)' % len(d), res))
         sys.stdout.flush()
@@ -848,7 +872,7 @@ if __name__ == "__main__":
             d_txt = TrainingData.extract_section_lief(d, section='text')
         else:
             d_txt = TrainingData.extract_section_elfesteem(d, section='text')
-            if d_txt == None:
+            if d_txt is None:
                 d_txt = TrainingData.extract_section_lief(d, section='text')
         if d_txt != None:
             res, r2, r3 = p.deduce(d_txt)
@@ -928,4 +952,5 @@ try:
             return (entropy / 8)
 
 except ImportError:
+    # This class does not need to be defined if cpu_rec is not used with binwalk
     pass
