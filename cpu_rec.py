@@ -758,6 +758,7 @@ def which_arch(d = None, training = {}):
         t = TrainingData()
         t.read_corpus()
         training['p'] = FileAnalysis(t)
+        del t
     if d is None:
         return None
     res, r2, r3 = training['p'].deduce(d)
@@ -805,16 +806,17 @@ if __name__ == "__main__":
     pickled_data = os.path.join(os.path.dirname(__file__), "stats.pick")
     if os.path.isfile(pickled_data):
         log.info("Loading training data from pickled file")
-        t, p = pickle.load(open(pickled_data, "rb"))
+        p = pickle.load(open(pickled_data, "rb"))
     else:
         log.info("Pickled training data not found, loading from corpus")
         t = TrainingData()
         t.read_corpus()
         p = FileAnalysis(t)
+        del t
         log.info("Saving pickled training data")
         try:
             f = open(pickled_data, "wb")
-            pickle.dump((t, p), f)
+            pickle.dump(p, f)
             f.close()
         except OSError:
             log.warning("Could not save cached training data")
