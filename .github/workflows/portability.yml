@@ -71,6 +71,27 @@ jobs:
     - name: Use cpu_rec as a python module
       run: |
         python -c 'from cpu_rec import which_arch; print(which_arch(open("/bin/sh","rb").read()))'
+    - name: Get and install binwalk
+      if: ${{ steps.pyver.outputs.pyver == 3 && !(matrix.python-version == 'graalpy-22.3') }}
+      run: |
+        # pip install binwalk results in a non-working installation :-(
+        pip install pytest pytest-cov matplotlib
+        git clone https://github.com/OSPG/binwalk
+        cd binwalk
+        sudo python setup.py install
+    - name: Test binwalk
+      if: ${{ steps.pyver.outputs.pyver == 3 && !(matrix.python-version == 'graalpy-22.3') }}
+      run: |
+        binwalk /bin/sh
+    - name: Install cpu_rec as a binwalk module
+      if: ${{ steps.pyver.outputs.pyver == 3 && !(matrix.python-version == 'graalpy-22.3') }}
+      run: |
+        mkdir -p $HOME/.config/binwalk/modules
+        cp -pr cpu_rec.py cpu_rec_corpus $HOME/.config/binwalk/modules
+    - name: Analyze /bin/sh with binwalk
+      if: ${{ steps.pyver.outputs.pyver == 3 && !(matrix.python-version == 'graalpy-22.3') }}
+      run: |
+        binwalk -% /bin/sh
 
   python24:
     runs-on: "ubuntu-latest"
