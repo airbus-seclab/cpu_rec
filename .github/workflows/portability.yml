@@ -68,6 +68,9 @@ jobs:
       if: ${{ steps.pyver.outputs.pyver == 3 && !(matrix.os == 'macos-latest' && matrix.python-version == 'graalpy-22.3') }}
       run: |
         python ./cpu_rec.py -v /bin/sh
+    - name: Use cpu_rec as a python module
+      run: |
+        python -c 'from cpu_rec import which_arch; print(which_arch(open("/bin/sh","rb").read()))'
 
   python24:
     runs-on: "ubuntu-latest"
